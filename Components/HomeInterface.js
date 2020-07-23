@@ -4,6 +4,7 @@ import { Button, ThemeProvider,Card,ListItem} from 'react-native-elements';
 import { List } from 'react-native-paper';
 
 
+
 function HomeInterface(){
   return(
     <>
@@ -65,15 +66,49 @@ function HomeInterface(){
           </ScrollView>
 
           <View>
-             <Text style={styles.textStyle}>Discounts</Text>
+             <Text style={styles.textStyle}>Discounts </Text>
           </View>
-       </View>
+
+          <ListItem containerStyle ={styles.listItemContainer}
+            key={1}
+            leftAvatar={{
+           source: require('../assets/dimond4.jpg'),
+           }}
+           title=<Text style={styles.listItemTitle}>Welcome</Text>
+           subtitle=<Text style={styles.listItemDes}>offer generated at first signUp</Text>
+           rightSubtitle=<Text style={styles.price}>45$</Text>
+           bottomDivider
+          />
+          <ListItem containerStyle ={styles.listItemContainer}
+            key={2}
+            leftAvatar={{
+           source: require('../assets/dimond3.png'),
+           }}
+           title=<Text style={styles.listItemTitle}>Lucky day</Text>
+           subtitle=<Text style={styles.listItemDes}>offer generated on your birthday</Text>
+           rightSubtitle=<Text style={styles.price}>40$</Text>
+           bottomDivider
+          />
+          <ListItem containerStyle ={styles.listItemContainer}
+            key={3}
+            leftAvatar={{
+           source: require('../assets/dimond2.png'),
+           }}
+           title=<Text style={styles.listItemTitle}>happy year</Text>
+           subtitle=<Text style={styles.listItemDes}>offer generated idk when</Text>
+           rightSubtitle=<Text style={styles.price}>25$</Text>
+           bottomDivider
+          />
+
+
+          </View>
 
       </ScrollView>
     </SafeAreaView>
     </>
   )
 }
+
 const styles = StyleSheet.create({
   container:{
     flex:1,
@@ -105,6 +140,23 @@ const styles = StyleSheet.create({
     fontFamily:"GlueGun-GW8Z",
     fontSize:25,
     color:"#dce0e9"
+  },
+  listItemTitle:{
+    fontFamily:"GlueGun-GW8Z",
+    fontSize:15,
+    color:"#dce0e9"
+  },
+  listItemDes:{
+    fontSize:12,
+    color:"#dce0e9"
+  },
+  listItemContainer:{
+    backgroundColor:"#121419"
+  },
+  price:{
+      fontFamily:"GlueGun-GW8Z",
+       fontSize:20,
+       color:"#dce0e9"
   }
 
 })
