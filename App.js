@@ -38,9 +38,10 @@ const App: () => React$Node = () => {
         {/* <TabNavigator/> */}
         {/* <StackNavigator/> */}
 {/* <SignInRouter/> */}
-<AuthRouter/>
+{/* this is the one */}
+{/* <AuthRouter/> */}
 {/* <SignUpRouter/> */}
-        {/* <TabNavigator/> */}
+        <TabNavigator/>
     </>
   );
 };

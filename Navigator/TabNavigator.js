@@ -8,8 +8,10 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import HomeInterface from "../Components/HomeInterface"
 import CatalogInterface from "../Components/CatalogInterface"
 import LikedInterface from "../Components/LikedInterface"
-import ProfileInterface from "../Components/ProfileInterface"
+// import ProfileInterface from "../Components/ProfileInterface"
 import SearchInterface from "../Components/SearchInterface"
+import ProfileInterface from "../Components/ProfileRoute"
+
 
 const Tab =  createMaterialTopTabNavigator();
 
