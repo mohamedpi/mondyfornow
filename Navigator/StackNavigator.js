@@ -10,10 +10,10 @@ export default function MyHomeStack() {
   return (
     <Stack.Navigator    screenOptions={{
 
-        headerStyle: { backgroundColor: '#C0C0C0' },
+        headerStyle: { backgroundColor: '#dce0e9' },
       }}>
       <Stack.Screen name="Home" component={HomeInterface} options={{headerTitleStyle:styles.labelStyle} } />
-      <Stack.Screen name="Offers" component={OffersListInterface} options={{headerTitleStyle:styles.labelStyle,headerTintColor:"#dce0e9"} } />
+      <Stack.Screen name="Offers" component={OffersListInterface} options={{headerTitleStyle:styles.labelStyle,headerTintColor:"black"} } />
     </Stack.Navigator>
   );
 }
