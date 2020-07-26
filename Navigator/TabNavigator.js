@@ -10,6 +10,7 @@ import CatalogInterface from "../Components/CatalogInterface"
 import LikedInterface from "../Components/LikedInterface"
 import ProfileInterface from "../Components/ProfileInterface"
 import SearchInterface from "../Components/SearchInterface"
+import MyHomeStack from "./StackNavigator"
 
 const Tab =  createMaterialTopTabNavigator();
 
@@ -32,7 +33,7 @@ function TabNavigator()
        indicatorStyle:{height:0},
        showIcon:true
      }}>
-         <Tab.Screen name="Home" component={HomeInterface}
+         <Tab.Screen name="Home" component={MyHomeStack}
          options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color, size }) => (

@@ -1,11 +1,12 @@
 import React from "react"
-import {View,Text,Image,SafeAreaView,StyleSheet,ScrollView} from "react-native"
+import {View,Text,Image,SafeAreaView,StyleSheet,ScrollView,TouchableOpacity} from "react-native"
 import { Button, ThemeProvider,Card,ListItem} from 'react-native-elements';
 import { List } from 'react-native-paper';
+import { createStackNavigator } from '@react-navigation/stack';
 
 
 
-function HomeInterface(){
+function HomeInterface(props){
   return(
     <>
     <SafeAreaView style ={styles.container} >
@@ -15,26 +16,34 @@ function HomeInterface(){
        </View>
        <View>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} scrollEventThrottle={16}>
+          <TouchableOpacity onPress={() => props.navigation.navigate('Offers')} >
             <Card
                containerStyle={styles.cardStyle}
                imageStyle={styles.imageStyle}
                image={require('../assets/cover.jpg')}>
              </Card>
+          </TouchableOpacity >
+          <TouchableOpacity  onPress={() => props.navigation.navigate('Offers')}>
              <Card
                 containerStyle={styles.cardStyle}
                 imageStyle={styles.imageStyle}
                 image={require('../assets/clashofclans.jpg')}>
               </Card>
+          </TouchableOpacity>
+          <TouchableOpacity  onPress={() => props.navigation.navigate('Offers')}>
               <Card
                  containerStyle={styles.cardStyle}
                  imageStyle={styles.imageStyle}
                  image={require('../assets/valorant.jpg')}>
                </Card>
+          </TouchableOpacity>
+         <TouchableOpacity onPress={() => props.navigation.navigate('Offers')}>
                <Card
                   containerStyle={styles.cardStyle}
                   imageStyle={styles.imageStyle}
                   image={require('../assets/uncharted4.jpg')}>
                 </Card>
+          </TouchableOpacity>
           </ScrollView>
        </View>
 

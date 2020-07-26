@@ -1,13 +1,28 @@
-import React from "react"
-import {View,Text,Image,StyleSheet} from "react-native"
+import React,{useState} from "react"
+import {View,Text,Image,StyleSheet,FlatList,ScrollView } from "react-native"
+import { SearchBar } from 'react-native-elements';
+import SearchItem from "./SearchItem"
 
 
 function SearchInterface(){
+  const [searchText,setSearchText] = useState("")
   return(
     <>
-       <View style={styles.container}>
-          <Text style={styles.textStyle}>welcome to Search page</Text>
-       </View>
+       <ScrollView style={styles.container}>
+          <View style ={styles.header}>
+          <SearchBar
+          placeholder="Type Here..."
+          onChangeText={setSearchText}
+           value={searchText}
+          />
+          </View>
+          <View>
+           <SearchItem/>
+            <SearchItem/>
+             <SearchItem/>
+              <SearchItem/>
+          </View>
+       </ScrollView>
     </>
   )
 }
@@ -24,6 +39,9 @@ const styles = StyleSheet.create({
       fontSize:25,
       color:"#dce0e9"
     },
+    header :{
+
+    }
 })
 
 export default SearchInterface
