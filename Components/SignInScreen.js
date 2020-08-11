@@ -9,36 +9,39 @@ import {
   Image,
   Alert,
   Dimensions,
-  PixelRatio
+  PixelRatio,
+  NativeModules,DeviceEventEmitter
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Actions} from 'react-native-router-flux';
-import { material } from 'react-native-typography';
-import { TypingAnimation } from 'react-native-typing-animation';
+import {material} from 'react-native-typography';
+// import { TypingAnimation } from 'react-native-typing-animation';
+import axios from 'axios';
+import FingerprintScanner from 'react-native-fingerprint-scanner';
+import TouchID from 'react-native-touch-id' ;
 
 var jwtDecode = require('jwt-decode');
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
-var FONT_BACK_LABEL   = 20;
+var FONT_BACK_LABEL = 20;
 
 if (PixelRatio.get() <= 2) {
   FONT_BACK_LABEL = 30;
 }
 
-
 export default class LoginView extends Component {
-  static navigationOptions = {
-    header: null,
-  };
+  // static navigationOptions = {
+  //   header: null,
+  // };
   constructor(props) {
     super(props);
-    state = {
-      name:'',
-      avatar:'',
+    this.state = {
+      name: '',
+      avatar: '',
       email: '',
       password: '',
       userId: '',
@@ -64,52 +67,77 @@ export default class LoginView extends Component {
 
   // _typing(){
   //   return(
-  //     <TypingAnimation 
+  //     <TypingAnimation
   //       dotColor="black"
   //       style={{marginRight:25}}
   //     />
   //   )
   // }
-  onClickListener = (viewId) => {
-    Alert.alert('Alert', 'Button pressed ' + viewId);
-  };
-
-goHome(){
-  Actions.HomeInterface();
-}
 
 
-goSignUp(){
-  Actions.SignUp();
-}
-  //   async register() {
-  //    const res= await axio.post('http://192.168.1.109:8082/user/login', {
-  //       email: this.state.email,
-  //       password: this.state.password,
-  //     });
-  //     if (res.success){
-  //         var decoded = jwt_decode(token);
+_pressHandler() {
+  
 
-  //         this.setState({success:true, userId:decoded._id});
+ TouchID.isSupported()
+  .then(success => {
+    // Success code
+       console.log("supported");
+  })
+  .catch(error => {
+    // Failure code
+    console.log(error);
+    Alert.alert('Device does not support touch ID')
+  })
+  
+    TouchID.authenticate('to demo this react-native component', optionalConfigObject)
+      .then(success => {
+        Alert.alert('Authenticated Successfully');
+      })
+      .catch(error => {
+        Alert.alert('Authentication Failed');
+      });
+  }
 
-  //     }
-  // if (this.state.success){
-  //     Alert.alert("success",'welcome');
-  // }
-  // else{
-  //     Alert.alert("no",'nonono');
 
-  // }
-  //   }
+  goSignUp() {
+    Actions.SignUp();
+  }
+  async goHome() {
+    // console.warn(this.state.email + this.state.password)
+    try {
+      const res = await axios.post('http://192.168.1.109:8082/user/login', {
+        // email: this.state.email,
+        // password: this.state.password,
+        email: 'ghjqssq',
+        password: 'vghbjnk,l;',
+      });
+      console.log(res);
+      if (res.status == 200) {
+        var decoded = jwt_decode(token);
+
+        // this.setState({success: true, userId: decoded._id});
+        Actions.HomeInterface();
+      }
+      // if (this.state.success){
+      //     Alert.alert("success",'welcome');
+      //     Actions.HomeInterface();
+      // }
+      else {
+        Alert.alert('no', 'nonono');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   render() {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView>
           <View style={styles.container}>
-          <View style={{height: screenHeight * 0.08}}></View>
+            <View style={{height: screenHeight * 0.08}}></View>
             <View>
-            <Text style={material.display1}>Sign In</Text>
+              <Text style={material.display1}>Sign In</Text>
             </View>
             <View style={{height: screenHeight * 0.08}}></View>
             <View style={styles.inputContainer}>
@@ -120,16 +148,15 @@ goSignUp(){
               />
               <TextInput
                 style={styles.inputs}
-                onSubmitEditing={()=>this.password.focus()}
+                onSubmitEditing={() => this.password.focus()}
                 placeholder="Email"
                 keyboardType="email-address"
                 underlineColorAndroid="transparent"
-                onChangeText={(email) => this.setState({email})}
-                // onFocus={()=>this._focus("email")}
+                onChangeText={(email) => {
+                  this.setState({email});
+                }}
               />
-               {/* {this.state.typing_email ?
-                      this._typing()
-                    : null} */}
+              {this.state.typing_email ? this._typing() : null}
             </View>
 
             <View style={styles.inputContainer}>
@@ -139,39 +166,45 @@ goSignUp(){
                 size={screenWidth * 0.08}
               />
               <TextInput
-              ref={(password) =>this.password=password}
+                ref={(password) => (this.password = password)}
                 style={styles.inputs}
                 placeholder="Password"
                 secureTextEntry={true}
                 underlineColorAndroid="transparent"
                 onChangeText={(password) => this.setState({password})}
-                // onFocus={()=>this._focus("password")}
-
               />
-               {/* {this.state.typing_email ?
-                      this._typing()
-                    : null} */}
+              {this.state.typing_email ? this._typing() : null}
             </View>
 
             <TouchableHighlight
               style={[styles.buttonContainer, styles.loginButton]}
               onPress={() => this.goHome()}>
-              <Text style={styles.loginText}>Register</Text>
+              <Text style={styles.loginText}>Sign In</Text>
             </TouchableHighlight>
 
-            <TouchableHighlight underlayColor='rgba(73,182,77,1,0.9)' 
+            <TouchableHighlight
+              style={[styles.buttonContainer, styles.loginButton]}
+             onPress={this._pressHandler}>
+              <Text style={styles.loginText}>Login with fingerprint</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              underlayColor="rgba(73,182,77,1,0.9)"
               style={styles.buttonContainer}
-              
-              onPress={
-                () => this.goSignUp()
-                }>
+              onPress={() => this.goSignUp()}>
               <Text>Don't have an account? Sign Up here</Text>
             </TouchableHighlight>
-          </View> 
+          </View>
         </ScrollView>
       </SafeAreaView>
     );
   }
+}
+
+//config is optional to be passed in on Android
+const optionalConfigObject = {
+  title: "Authentication Required", // Android
+  color: "#e00606", // Android,
+  fallbackLabel: "Show Passcode" // iOS (if empty, then label is hidden)
 }
 
 const styles = StyleSheet.create({
@@ -197,7 +230,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     borderBottomColor: '#FFFFFF',
     flex: 1,
-    fontSize:FONT_BACK_LABEL,
+    fontSize: FONT_BACK_LABEL,
   },
   inputIcon: {
     width: 30,
@@ -223,14 +256,15 @@ const styles = StyleSheet.create({
   icon: {
     marginLeft: screenWidth * 0.04,
   },
-  title:{
+  title: {
     marginTop: 16,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: "#20232a",
+    borderColor: '#20232a',
     borderRadius: 6,
-    color: "#20232a",
-    textAlign: "center",
-    fontWeight: "bold",
-  }
+    color: '#20232a',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
 });
+

@@ -8,8 +8,8 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+// import {List} from 'react-native-paper';
 import {Button, ThemeProvider, Card, ListItem} from 'react-native-elements';
-import {List} from 'react-native-paper';
 
 function HomeInterface() {
   const hello = () => {

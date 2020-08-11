@@ -8,16 +8,19 @@ import {
   TouchableHighlight,
   Image,
   Alert,
-  Dimensions,PixelRatio,
+  Dimensions,
+  PixelRatio,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Actions} from 'react-native-router-flux';
-import { material } from 'react-native-typography';
+import {material} from 'react-native-typography';
+import ImagePicker from 'react-native-image-picker';
+// import Icon from 'react-native-icons';
 
 var jwtDecode = require('jwt-decode');
-var FONT_BACK_LABEL   = 20;
+var FONT_BACK_LABEL = 20;
 
 if (PixelRatio.get() <= 2) {
   FONT_BACK_LABEL = 30;
@@ -29,14 +32,15 @@ export default class SignUpScreen extends Component {
   static navigationOptions = {
     header: null,
   };
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     state = {
-      name:'',
-      avatar:'',
+      name: '',
+      avatar: '',
       email: '',
       password: '',
       userId: '',
+      photo: null,
       success: false,
     };
   }
@@ -45,19 +49,20 @@ export default class SignUpScreen extends Component {
     Alert.alert('Alert', 'Button pressed ' + viewId);
   };
 
-goHome(){
-  Actions.HomeInterface();
+  goHome() {
+    Actions.HomeInterface();
+  }
 
-}
-
-
-goSignIn(){
-  Actions.SignIn();
-}
+  goSignIn() {
+    Actions.SignIn();
+  }
   //   async register() {
-  //    const res= await axio.post('http://192.168.1.109:8082/user/login', {
+  //    const res= await axios.post('http://192.168.1.109:8082/user/register', {
   //       email: this.state.email,
   //       password: this.state.password,
+  //       avatar: this.state.avatar,
+  //       name: this.state.name,
+
   //     });
   //     if (res.success){
   //         var decoded = jwt_decode(token);
@@ -74,14 +79,28 @@ goSignIn(){
   // }
   //   }
 
+  takePic() {
+    const options = {
+      noData: true,
+    };
+    ImagePicker.launchImageLibrary(options, (response) => {
+      console.log('response', response);
+
+      if (response.uri) {
+        this.setState({photo: response});
+      }
+    });
+  }
+
   render() {
+    // const {photo} = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView>
           <View style={styles.container}>
             <View style={{height: screenHeight * 0.08}}></View>
             <View>
-            <Text style={material.display1}>Sign Up</Text>
+              <Text style={material.display1}>Sign Up</Text>
             </View>
             <View style={{height: screenHeight * 0.08}}></View>
             <View style={styles.inputContainer}>
@@ -104,6 +123,7 @@ goSignIn(){
                 name="smileo"
                 size={screenWidth * 0.08}
               />
+
               <TextInput
                 style={styles.inputs}
                 placeholder="Avatar"
@@ -112,6 +132,32 @@ goSignIn(){
                 onChangeText={(avatar) => this.setState({avatar})}
               />
             </View>
+            <TouchableHighlight
+              onPress={() => {
+                this.takePic();
+              }}>
+              <View style={styles.inputContainer}>
+                <AntDesign
+                  style={styles.icon}
+                  name="camerao"
+                  size={screenWidth * 0.08}
+                />
+              </View>
+              {/* this.state.photo !=null? (<Image source= {{uri:this.state.photo.uri}} />) */}
+              {/* <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                {this.state.photo && (
+                  <Image
+                    source={{uri: this.state.photo.uri}}
+                    style={{width: 300, height: 300}}
+                  />
+                )}
+              </View> */}
+            </TouchableHighlight>
             <View style={styles.inputContainer}>
               <AntDesign
                 style={styles.icon}
@@ -145,10 +191,11 @@ goSignIn(){
             <TouchableHighlight
               style={[styles.buttonContainer, styles.loginButton]}
               onPress={() => this.goHome()}>
-              <Text style={styles.loginText}>Register</Text>
+              <Text style={styles.loginText}>Sign Up</Text>
             </TouchableHighlight>
 
-            <TouchableHighlight underlayColor='rgba(73,182,77,1,0.9)' 
+            <TouchableHighlight
+              underlayColor="rgba(73,182,77,1,0.9)"
               style={styles.buttonContainer}
               onPress={() => this.goSignIn()}>
               <Text>Already have an account? Login here</Text>

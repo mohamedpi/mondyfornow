@@ -33,15 +33,16 @@ import SignUpRouter from './Components/SignUpRouter'
 import AuthRouter from './Components/AuthRouter'
 
 const App: () => React$Node = () => {
+  console.disableYellowBox = true;
   return (
     <>
         {/* <TabNavigator/> */}
         {/* <StackNavigator/> */}
 {/* <SignInRouter/> */}
 {/* this is the one */}
-{/* <AuthRouter/> */}
+<AuthRouter/>
 {/* <SignUpRouter/> */}
-        <TabNavigator/>
+        {/* <TabNavigator/> */}
     </>
   );
 };

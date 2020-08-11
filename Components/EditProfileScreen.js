@@ -11,22 +11,11 @@ import {
 import {Actions} from 'react-native-router-flux';
 import {
   Container,
-  Header,
-  Body,
-  Title,
   Content,
   Form,
-  Item,
-  Input,
-  Icon,
-  Button,
   Text,
-  Label,
   View,
   H3,
-  Picker,
-  ListItem,
-  Checkbox,
 } from 'native-base';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {SafeAreaView} from 'react-native-safe-area-context';

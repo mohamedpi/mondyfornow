@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Router, Stack, Scene} from 'react-native-router-flux';
 import SignUp from './SignUpRouter';
 import SignIn from './LoginRouter';
+import finger from './fingerprint'
 import Auth from './AuthInterface'
 export default class Route extends Component {
   render() {
