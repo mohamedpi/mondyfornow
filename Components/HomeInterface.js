@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Text,
@@ -10,18 +10,21 @@ import {
 } from 'react-native';
 // import {List} from 'react-native-paper';
 import {Button, ThemeProvider, Card, ListItem} from 'react-native-elements';
+import Names from '../fields.json';
 
-function HomeInterface() {
-  const hello = () => {
-    console.warn('hello');
-  };
+
+export default class HomeInterface extends Component {
+
+ 
+
+render(){
   return (
-    <>
+ 
       <SafeAreaView style={styles.container}>
         <ScrollView scrollEventThrottle={16}>
           <View>
             <View>
-              <Text style={styles.textStyle}>check our hot list</Text>
+              <Text style={styles.textStyle}>{Names.Home.HotList}</Text>
             </View>
             <View style={{backgroundColor: 'white'}}>
               <ScrollView
@@ -47,8 +50,8 @@ function HomeInterface() {
               </ScrollView>
             </View>
 
-            <View >
-              <Text style={styles.textStyle}>check our new offers</Text>
+            <View>
+              <Text style={styles.textStyle}>{Names.Home.NewOffers}</Text>
             </View>
             <View style={{backgroundColor: 'white'}}>
               <ScrollView
@@ -76,10 +79,10 @@ function HomeInterface() {
               </ScrollView>
             </View>
             <View>
-              <Text style={styles.textStyle}>Discounts </Text>
+              <Text style={styles.textStyle}>{Names.Home.Discounts} </Text>
             </View>
             <View style={{backgroundColor: 'white'}}>
-              <ListItem 
+              <ListItem
                 containerStyle={styles.listItemContainer}
                 key={1}
                 leftAvatar={{
@@ -122,9 +125,11 @@ function HomeInterface() {
           </View>
         </ScrollView>
       </SafeAreaView>
-    </>
-  );
+    
+              );
+            }
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -174,4 +179,3 @@ const styles = StyleSheet.create({
     color: '#dce0e9',
   },
 });
-export default HomeInterface;

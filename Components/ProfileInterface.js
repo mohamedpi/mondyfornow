@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import {Actions} from 'react-native-router-flux';
-
+import ProfileScreen from './profile/index'
 export default class Profile extends Component {
   goToEdit() {
     Actions.Edit();
@@ -17,7 +17,8 @@ export default class Profile extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.header}></View>
+<ProfileScreen/>
+        {/* <View style={styles.header}></View>
         <Image
           style={styles.avatar}
           source={require('../assets/profile.jpg')}
@@ -37,7 +38,7 @@ export default class Profile extends Component {
               <Text>Search History</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
       </View>
     );
   }
@@ -45,8 +46,10 @@ export default class Profile extends Component {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#121419',
+    backgroundColor: '#708090',
     height: 200,
+    borderBottomLeftRadius: 200,
+    borderBottomEndRadius: 20,
   },
   avatar: {
     width: 130,

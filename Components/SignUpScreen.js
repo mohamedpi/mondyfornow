@@ -10,6 +10,7 @@ import {
   Alert,
   Dimensions,
   PixelRatio,
+  Animated,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
@@ -17,7 +18,9 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {Actions} from 'react-native-router-flux';
 import {material} from 'react-native-typography';
 import ImagePicker from 'react-native-image-picker';
-// import Icon from 'react-native-icons';
+// import Icon from 'react-native-icons'
+import Names from '../fields.json';
+import axios from 'axios';
 
 var jwtDecode = require('jwt-decode');
 var FONT_BACK_LABEL = 20;
@@ -34,7 +37,7 @@ export default class SignUpScreen extends Component {
   };
   constructor() {
     super();
-    state = {
+    this.state = {
       name: '',
       avatar: '',
       email: '',
@@ -42,6 +45,9 @@ export default class SignUpScreen extends Component {
       userId: '',
       photo: null,
       success: false,
+      indicator: new Animated.Value(0),
+      wholeHeight: 1,
+      visibleHeight: 0,
     };
   }
 
@@ -56,28 +62,36 @@ export default class SignUpScreen extends Component {
   goSignIn() {
     Actions.SignIn();
   }
-  //   async register() {
-  //    const res= await axios.post('http://192.168.1.109:8082/user/register', {
-  //       email: this.state.email,
-  //       password: this.state.password,
-  //       avatar: this.state.avatar,
-  //       name: this.state.name,
 
-  //     });
-  //     if (res.success){
-  //         var decoded = jwt_decode(token);
+  async register() {
+    
+    let uri = this.state.photo.uri;
+    let formData = new FormData();
+    let filename = uri.split('/').pop();
+    console.log(filename);
+    formData.append('userImage', {
+      uri: this.state.photo.uri,
+      type: this.state.photo.type,
+      name: this.state.photo.fileName,
+    });
+    formData.append('email', this.state.email);
+    formData.append('password', this.state.password);
+    formData.append('avatar', this.state.avatar);
+    formData.append('name', this.state.name);
 
-  //         this.setState({success:true, userId:decoded._id});
-
-  //     }
-  // if (this.state.success){
-  //     Alert.alert("success",'welcome');
-  // }
-  // else{
-  //     Alert.alert("no",'nonono');
-
-  // }
-  //   }
+    const header = {
+      Accept: 'application/json',
+      'content-type': 'multipart/form-data',
+    };
+    fetch('http://192.168.1.213:8082/user/register', {
+      method: 'POST',
+      headers: header,
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((res) => console.log(res))
+      .catch((err) => console.log('err', err));
+  }
 
   takePic() {
     const options = {
@@ -94,13 +108,37 @@ export default class SignUpScreen extends Component {
 
   render() {
     // const {photo} = this.state;
+    const indicatorSize =
+      this.state.wholeHeight > this.state.visibleHeight
+        ? (this.state.visibleHeight * this.state.visibleHeight) /
+          this.state.wholeHeight
+        : this.state.visibleHeight;
+
+    const difference =
+      this.state.visibleHeight > indicatorSize
+        ? this.state.visibleHeight - indicatorSize
+        : 1;
+
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={(width, height) => {
+            this.setState({wholeHeight: height});
+          }}
+          onLayout={({
+            nativeEvent: {
+              layout: {x, y, width, height},
+            },
+          }) => this.setState({visibleHeight: height})}
+          scrollEventThrottle={16}
+          onScroll={Animated.event([
+            {nativeEvent: {contentOffset: {y: this.state.indicator}}},
+          ])}>
           <View style={styles.container}>
             <View style={{height: screenHeight * 0.08}}></View>
             <View>
-              <Text style={material.display1}>Sign Up</Text>
+              <Text style={material.display1}>{Names.SignUp.SignUp}</Text>
             </View>
             <View style={{height: screenHeight * 0.08}}></View>
             <View style={styles.inputContainer}>
@@ -111,7 +149,7 @@ export default class SignUpScreen extends Component {
               />
               <TextInput
                 style={styles.inputs}
-                placeholder="Name"
+                placeholder={Names.SignUp.Name}
                 keyboardType="default"
                 underlineColorAndroid="transparent"
                 onChangeText={(name) => this.setState({name})}
@@ -126,7 +164,7 @@ export default class SignUpScreen extends Component {
 
               <TextInput
                 style={styles.inputs}
-                placeholder="Avatar"
+                placeholder={Names.SignUp.Avatar}
                 keyboardType="default"
                 underlineColorAndroid="transparent"
                 onChangeText={(avatar) => this.setState({avatar})}
@@ -137,27 +175,36 @@ export default class SignUpScreen extends Component {
                 this.takePic();
               }}>
               <View style={styles.inputContainer}>
-                <AntDesign
-                  style={styles.icon}
-                  name="camerao"
-                  size={screenWidth * 0.08}
-                />
-              </View>
-              {/* this.state.photo !=null? (<Image source= {{uri:this.state.photo.uri}} />) */}
-              {/* <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                {this.state.photo && (
-                  <Image
-                    source={{uri: this.state.photo.uri}}
-                    style={{width: 300, height: 300}}
-                  />
+                {this.state.photo != null ? (
+                  // <Image
+                  //   source={{uri: this.state.photo.uri}}
+                  //   style={{width: 50, height: 50,borderRadius:39}}
+                  // />
+                  <View style={{flexDirection: 'row'}}>
+                    <AntDesign
+                      style={styles.icon}
+                      name="camerao"
+                      size={screenWidth * 0.08}
+                    />
+                    <Text style={{alignSelf: 'center'}}>
+                      {this.state.photo.fileName}
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={{flexDirection: 'row'}}>
+                    <AntDesign
+                      style={styles.icon}
+                      name="camerao"
+                      size={screenWidth * 0.08}
+                    />
+                    <Text style={{alignSelf: 'center'}}>
+                      {Names.SignUp.Photo}
+                    </Text>
+                  </View>
                 )}
-              </View> */}
+              </View>
             </TouchableHighlight>
+
             <View style={styles.inputContainer}>
               <AntDesign
                 style={styles.icon}
@@ -166,7 +213,7 @@ export default class SignUpScreen extends Component {
               />
               <TextInput
                 style={styles.inputs}
-                placeholder="Email"
+                placeholder={Names.SignUp.Email}
                 keyboardType="email-address"
                 underlineColorAndroid="transparent"
                 onChangeText={(email) => this.setState({email})}
@@ -181,7 +228,7 @@ export default class SignUpScreen extends Component {
               />
               <TextInput
                 style={styles.inputs}
-                placeholder="Password"
+                placeholder={Names.SignUp.Password}
                 secureTextEntry={true}
                 underlineColorAndroid="transparent"
                 onChangeText={(password) => this.setState({password})}
@@ -190,15 +237,15 @@ export default class SignUpScreen extends Component {
 
             <TouchableHighlight
               style={[styles.buttonContainer, styles.loginButton]}
-              onPress={() => this.goHome()}>
-              <Text style={styles.loginText}>Sign Up</Text>
+              onPress={() => this.register()}>
+              <Text style={styles.loginText}>{Names.SignUp.SignUp}</Text>
             </TouchableHighlight>
 
             <TouchableHighlight
               underlayColor="rgba(73,182,77,1,0.9)"
               style={styles.buttonContainer}
               onPress={() => this.goSignIn()}>
-              <Text>Already have an account? Login here</Text>
+              <Text>{Names.SignUp.withAccount}</Text>
             </TouchableHighlight>
           </View>
         </ScrollView>

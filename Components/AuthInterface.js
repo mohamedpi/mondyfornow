@@ -15,6 +15,7 @@ import * as Animatable from 'react-native-animatable';
 import AwesomeButton from 'react-native-really-awesome-button';
 // import { createStackNavigator } from '@react-navigation/stack';
 import {Actions} from 'react-native-router-flux';
+import Names from '../fields.json';
 
 
 
@@ -24,8 +25,6 @@ const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
 export default class SignInInterface extends Component {
-
-
 
   render() {
     return (
@@ -47,9 +46,9 @@ export default class SignInInterface extends Component {
               onPress={() => {
                 Actions.SignIn();
               }}>
-              Sign in
+              {Names.splashScreen.SignIn}
             </AwesomeButton>
-        
+
             <View style={{height: screenHeight * 0.01}}></View>
 
             <AwesomeButton
@@ -64,7 +63,7 @@ export default class SignInInterface extends Component {
               onPress={() => {
                 Actions.SignUp();
               }}>
-              Sign up
+              {Names.splashScreen.SignUp}
             </AwesomeButton>
             <View style={{height: screenHeight * 0.01}}></View>
 
@@ -78,7 +77,7 @@ export default class SignInInterface extends Component {
               backgroundShadow="#3282b8"
               backgroundDarker="#3282b8"
               onPress={() => {}}>
-              Sign in with Facebook
+              {Names.splashScreen.SignInFb}
             </AwesomeButton>
           </View>
         </Animatable.View>

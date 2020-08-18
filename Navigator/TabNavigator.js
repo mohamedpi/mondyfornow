@@ -10,7 +10,7 @@ import CatalogInterface from "../Components/CatalogInterface"
 import LikedInterface from "../Components/LikedInterface"
 // import ProfileInterface from "../Components/ProfileInterface"
 import SearchInterface from "../Components/SearchInterface"
-import ProfileInterface from "../Components/ProfileRoute"
+import ProfileInterface from "../Components/ProfileRouter"
 
 
 const Tab =  createMaterialTopTabNavigator();

@@ -10,7 +10,6 @@ export default function StackNavigator() {
   return (
       <NavigationContainer>
     <Stack.Navigator>
-
       <Stack.Screen name="Auth" component={Auth} />
       <Stack.Screen name="SignIn" component={SignInScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
