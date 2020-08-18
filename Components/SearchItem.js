@@ -1,25 +1,26 @@
 import React from 'react'
 import { StyleSheet, View, Text, Image,TouchableOpacity} from 'react-native'
 
+
 const SearchItem =(props)=> {
 
     return (
       <TouchableOpacity style={styles.main_container} >
         <Image
           style={styles.image}
-          source={require('../assets/clashofclans.jpg')}
+          source={{uri : props.game.imageURI}}
         />
         <View style={styles.content_container}>
           <View style={styles.header_container}>
-            <Text style={styles.title_text}>Best Item</Text>
-            <Text style={styles.vote_text}>9.9</Text>
+            <Text style={styles.title_text}>{props.game.title}</Text>
+            <Text style={styles.vote_text}>{props.game.rating}</Text>
           </View>
           <View style={styles.description_container}>
-            <Text style={styles.description_text} numberOfLines={6}>this is a description this should be long text so here i am writing i don't know why i am doing this i mean why i am writing these lines but if you read this you are wasting your time </Text>
+            <Text style={styles.description_text} numberOfLines={6}>{props.game.description}</Text>
             {/* La propriété numberOfLines permet de couper un texte si celui-ci est trop long, il suffit de définir un nombre maximum de ligne */}
           </View>
           <View style={styles.date_container}>
-            <Text style={styles.date_text}>20-12-2020</Text>
+            <Text style={styles.date_text}>{props.game.date}</Text>
           </View>
         </View>
       </TouchableOpacity>

@@ -1,18 +1,30 @@
-import React from "react"
-import {View,Text,StyleSheet,Dimensions,SafeAreaView,Image,ScrollView} from "react-native"
+import React,{useEffect,useState} from "react"
+import {View,Text,StyleSheet,Dimensions,SafeAreaView,Image,ScrollView,Alert,TouchableOpacity} from "react-native"
 import { Button, ThemeProvider,Card,ListItem} from 'react-native-elements';
+import Axios from "axios"
+
 
 var width = Dimensions.get('window').width
 var height = Dimensions.get("window").height
 
-function OffersListInterface()
-{
+function OffersListInterface(props){
+  const {game} = props.route.params
+  const [offres,setOffres] = useState([])
+
+  useEffect(()=>{
+    async function getOffreById()
+    {
+    const response = await Axios.get("https://galactech.herokuapp.com/offersById",{gameID:game._id})
+    setOffres(response.data)
+    }
+    getOffreById()
+  },offres)
   return(
      <>
         <SafeAreaView style ={styles.container}>
          <ScrollView>
             <View>
-              <Image style ={styles.coverImage} source ={require("../assets/uncharted4.jpg")}/>
+              <Image style ={styles.coverImage} source={{uri : game.imageURI }}/>
             </View>
             <View style = {styles.details}>
             <ListItem containerStyle ={styles.listItemContainer}
@@ -21,32 +33,23 @@ function OffersListInterface()
              source: require('../assets/details.jpg'),
              }}
              title=<Text style={styles.listItemTitle}>Details </Text>
-             subtitle=<Text style={styles.listItemDes}>offer generated idk when just fill the field tadan tada
-             this is just decription hope this app continue to amuse you and descritption section anyways </Text>
+             subtitle=<Text style={styles.listItemDes}>{game.description} </Text>
             />
             </View>
             <View style = {styles.offersContainer}>
-
+            {game.offers.map(e =>(
+              <View  key={e.id}>
+                 <TouchableOpacity   onPress={() =>props.navigation.navigate("OfferItem",{offer:e})}>
               <Card
+                 key={e.id}
                  containerStyle={styles.cardStyle}
                  imageStyle={styles.imageStyle}
-                 image={require('../assets/dimond1.png')}>
-               </Card>
-               <Card
-                  containerStyle={styles.cardStyle}
-                  imageStyle={styles.imageStyle}
-                  image={require('../assets/dimond2.png')}>
-                </Card>
-                <Card
-                   containerStyle={styles.cardStyle}
-                   imageStyle={styles.imageStyle}
-                   image={require('../assets/dimond3.png')}>
-                 </Card>
-                 <Card
-                    containerStyle={styles.cardStyle}
-                    imageStyle={styles.imageStyle}
-                    image={require('../assets/dimond4.jpg')}>
-                  </Card>
+                 image={<Image source ={{uri :e.imageURI}}/>}>
+
+             </Card>
+             </TouchableOpacity>
+             </View>
+           ))}
             </View>
         </ScrollView>
 
@@ -105,4 +108,6 @@ const styles = StyleSheet.create({
      flexWrap:"wrap"
    }
 })
+
+
 export default OffersListInterface

@@ -24,14 +24,21 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+
 import LoginInterface from "./Components/LoginInterface"
 import HomeInterface from "./Components/HomeInterface"
 import TabNavigator  from "./Navigator/TabNavigator"
+import { store } from "./store/store";
+import { Provider } from "react-redux";
+import SignInRouter from "./Navigator/SignInRouter"
 
 const App: () => React$Node = () => {
   return (
     <>
-        <TabNavigator/>
+    <Provider store={store}>
+         <SignInRouter/>
+      
+    </Provider>
     </>
   );
 };

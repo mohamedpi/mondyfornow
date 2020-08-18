@@ -1,27 +1,52 @@
-import React,{useState} from "react"
-import {View,Text,Image,StyleSheet,FlatList,ScrollView } from "react-native"
+import React,{useState,useEffect} from "react"
+import {View,Text,Image,StyleSheet,FlatList,ScrollView,Alert} from "react-native"
 import { SearchBar } from 'react-native-elements';
 import SearchItem from "./SearchItem"
+import Axios from "axios"
+import { connect } from "react-redux";
 
 
-function SearchInterface(){
+
+function SearchInterface(props){
   const [searchText,setSearchText] = useState("")
+  const [dataList,setDataList]     = useState([])
+  const [data,setData]  = useState("")
+
+
+  useEffect(()=>{
+    async function getData()
+   {
+    const response = await Axios.get("https://galactech.herokuapp.com/games");
+    setData(response.data)
+   }
+   getData()
+ })
+
+const handleTextChange = (text) =>{
+    setSearchText(text)
+    if(text === "")
+    setDataList(data)
+    else
+    {
+     setDataList(data.filter(x => String(x.title.toLowerCase()).includes(text.toLowerCase())))
+    }
+
+}
+
   return(
     <>
        <ScrollView style={styles.container}>
           <View style ={styles.header}>
           <SearchBar
           placeholder="Type Here..."
-          onChangeText={setSearchText}
-           value={searchText}
+          onChangeText={handleTextChange}
+          value={searchText}
           />
           </View>
           <View>
-           <SearchItem/>
-            <SearchItem/>
-             <SearchItem/>
-              <SearchItem/>
+             {dataList.map(item  => <SearchItem key ={item._id} game ={item}/>) }
           </View>
+
        </ScrollView>
     </>
   )
@@ -44,4 +69,9 @@ const styles = StyleSheet.create({
     }
 })
 
-export default SearchInterface
+const mapStateProps = (state) => ({
+  games: state.games
+});
+
+
+export default connect(mapStateProps)(SearchInterface);

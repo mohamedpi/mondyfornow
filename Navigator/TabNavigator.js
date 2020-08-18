@@ -10,6 +10,8 @@ import CatalogInterface from "../Components/CatalogInterface"
 import LikedInterface from "../Components/LikedInterface"
 import ProfileInterface from "../Components/ProfileInterface"
 import SearchInterface from "../Components/SearchInterface"
+import OfferItem from "../Components/OfferItem"
+import LoginScreen from "../Components/LoginScreen"
 import MyHomeStack from "./StackNavigator"
 
 const Tab =  createMaterialTopTabNavigator();
@@ -41,7 +43,7 @@ function TabNavigator()
           ),
         }} />
 
-         <Tab.Screen name="Catalog" component={CatalogInterface}  options={{
+         <Tab.Screen name="OfferItem" component={CatalogInterface}  options={{
            tabBarLabel: 'Catalog',
            tabBarIcon: ({ color, size }) => (
              <MaterialCommunityIcons name="details" color={color} size={24} />
