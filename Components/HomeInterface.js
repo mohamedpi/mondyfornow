@@ -39,12 +39,12 @@ function HomeInterface(props){
                   <Text style={styles.textStyle}>Our partners </Text>
           </View>
           <View style ={styles.categroyContainer}>
-               <Image source ={require("../assets/dimond1.png")} style={styles.categoryIcon}/>
-               <Image source ={require("../assets/dimond2.png")} style={styles.categoryIcon}/>
-               <Image source ={require("../assets/dimond3.png")} style={styles.categoryIcon}/>
+               <Image source ={require("../assets/axiata.jpg")} style={styles.categoryIcon}/>
+               <Image source ={require("../assets/Orange.jpg")} style={styles.categoryIcon}/>
+               <Image source ={require("../assets/Turkcell.jpg")} style={styles.categoryIcon}/>
           </View >
           <View style ={styles.categroyContainer}>
-               <Image source ={require("../assets/dimond1.png")} style={styles.categoryIcon}/>
+               <Image source ={require("../assets/amazon.png")} style={styles.categoryIcon}/>
                <Image source ={require("../assets/dimond2.png")} style={styles.categoryIcon}/>
                <Image source ={require("../assets/dimond3.png")} style={styles.categoryIcon}/>
           </View >
@@ -75,7 +75,7 @@ function HomeInterface(props){
 const styles = StyleSheet.create({
  container:{
    flex:1,
-   backgroundColor:"#181b20"
+   backgroundColor:"white"
 
  },
   textStyle:{
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
      marginVertical:20,
      fontFamily:"GlueGun-GW8Z",
      fontSize:25,
-     color:"#dce0e9",
+     color:"gray",
      textAlign:"center"
    },
    sliderContainer:{

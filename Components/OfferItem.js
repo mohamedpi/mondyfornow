@@ -49,19 +49,15 @@ const OfferItem = (props) => {
           onHide={() => navTitleView.current.fadeInUp(200)}
           onDisplay={() => navTitleView.current.fadeOut(100)}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text style={styles.title}>Overview</Text>
-            <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-              <FontAwesome name="star" size={16} color="#FF6347" />
-              <Text style={{marginHorizontal: 2}}>{3}</Text>
-              <Text>({offer.description})</Text>
-            </View>
+            <Text style={styles.title}>Description</Text>
+        
           </View>
         </TriggeringView>
         <View style={[styles.section, styles.sectionLarge]}>
           <Text style={styles.sectionContent}>{offer.description}</Text>
         </View>
 
-      
+
       </HeaderImageScrollView>
     </View>
   );

@@ -11,7 +11,7 @@ import LikedInterface from "../Components/LikedInterface"
 import ProfileInterface from "../Components/ProfileInterface"
 import SearchInterface from "../Components/SearchInterface"
 import OfferItem from "../Components/OfferItem"
-import LoginScreen from "../Components/LoginScreen"
+import LoginScreen from "../Components/SignInScreen"
 import MyHomeStack from "./StackNavigator"
 
 const Tab =  createMaterialTopTabNavigator();
@@ -26,7 +26,7 @@ function TabNavigator()
       tabBarPosition="bottom"
       tabBarOptions={{
       tabBarPosition:"bottom",
-       activeTintColor: 'red',
+       activeTintColor: '#FF4500',
        inactiveTintColor:"grey",
        showLabel:true,
        labelStyle:{fontSize:10,textTransform:"capitalize"},
@@ -39,14 +39,14 @@ function TabNavigator()
          options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={24} />
+            <MaterialCommunityIcons name="home" color={color} size={30} />
           ),
         }} />
 
          <Tab.Screen name="OfferItem" component={CatalogInterface}  options={{
            tabBarLabel: 'Catalog',
            tabBarIcon: ({ color, size }) => (
-             <MaterialCommunityIcons name="details" color={color} size={24} />
+             <MaterialCommunityIcons name="details" color={color} size={30} />
            ),
          }}/>
 
@@ -54,7 +54,7 @@ function TabNavigator()
          options={{
           tabBarLabel: 'Liked',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="heart" color={color} size={24} />
+            <MaterialCommunityIcons name="heart" color={color} size={30} />
           ),
         }}/>
 
@@ -62,14 +62,14 @@ function TabNavigator()
          options={{
           tabBarLabel: 'Search',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="cloud-search" color={color} size={24} />
+            <MaterialCommunityIcons name="cloud-search" color={color} size={30} />
           ),
         }}/>
          <Tab.Screen name="Profile" component={ProfileInterface}  options={{
            tabBarLabel: 'Profile',
            activeBackgroundColor: "red",
            tabBarIcon: ({ color, size }) => (
-             <MaterialCommunityIcons name="face-profile" color={color} size={24} />
+             <MaterialCommunityIcons name="face-profile" color={color} size={30} />
            ),
          }}/>
        </Tab.Navigator>

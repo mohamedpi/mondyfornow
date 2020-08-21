@@ -30,14 +30,15 @@ import HomeInterface from "./Components/HomeInterface"
 import TabNavigator  from "./Navigator/TabNavigator"
 import { store } from "./store/store";
 import { Provider } from "react-redux";
-import SignInRouter from "./Navigator/SignInRouter"
+import SignInRouter from "./Navigator/LoginRouter"
+import AuthRouter from './Navigator/AuthRouter'
 
 const App: () => React$Node = () => {
   return (
     <>
     <Provider store={store}>
-         <SignInRouter/>
-      
+         <AuthRouter/>
+
     </Provider>
     </>
   );

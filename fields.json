@@ -1,0 +1,42 @@
+{
+    "splashScreen":{
+        "SignIn":"Sign In",
+        "SignUp" : "Sign Up",
+        "SignInFb":"Sign In With Facebook"
+    },
+    "SignIn":{
+        "Email":"Email",
+        "Password" : "Password",
+        "SignIn":"Sign In",
+        "FingerPrint":"Login with fingerprint",
+        "noAccount": "Don't have an account? Sign Up here."
+    },
+    "SignUp":{
+        "Email":"Email",
+        "Password" : "Password",
+        "Name" : "Name",
+        "Avatar" : "Avatar",
+        "Photo" : "Please choose a photo",
+        "SignUp":"Sign Up",
+        "FingerPrint":"Login with fingerprint",
+        "withAccount": "Already have an account? Login here."
+    },
+    "Home":{
+        "HotList":"Check our hot list",
+        "NewOffers" : "Check our new offers",
+        "Discounts" : "Discounts"
+    },
+    "Catalog":{
+        "Welcome":"Welcome to catalog page"
+    },
+    "Liked":{
+        "Welcome":"Your wishlist"
+    },
+    "Search":{
+        "Welcome":"Welcome to search page"
+    },
+    "Profile":{
+        "Edit":"Edit profile",
+        "Search History": "Search History"
+    }
+}

@@ -14,7 +14,7 @@ function OffersListInterface(props){
   useEffect(()=>{
     async function getOffreById()
     {
-    const response = await Axios.get("https://galactech.herokuapp.com/offersById",{gameID:game._id})
+    const response = await Axios.get( `https://galactech.herokuapp.com/offersById/${game._id}`)
     setOffres(response.data)
     }
     getOffreById()
@@ -37,14 +37,14 @@ function OffersListInterface(props){
             />
             </View>
             <View style = {styles.offersContainer}>
-            {game.offers.map(e =>(
-              <View  key={e.id}>
-                 <TouchableOpacity   onPress={() =>props.navigation.navigate("OfferItem",{offer:e})}>
+            {offres.map(e =>(
+              <View   key={e._id}  >
+                 <TouchableOpacity  onPress={() =>props.navigation.navigate("OfferItem",{offer:e})}>
               <Card
-                 key={e.id}
+
                  containerStyle={styles.cardStyle}
                  imageStyle={styles.imageStyle}
-                 image={<Image source ={{uri :e.imageURI}}/>}>
+                 image={{uri :e.imageURI}}>
 
              </Card>
              </TouchableOpacity>

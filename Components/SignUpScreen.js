@@ -1,249 +1,305 @@
-import React from "react";
+import React, {Component} from 'react';
 import {
-  View,
-ScrollView,
-  Text,
   StyleSheet,
-  ImageBackground,
-  StatusBar,
+  Text,
+  View,
   TextInput,
-  Animated,
+  Button,
+  TouchableHighlight,
+  Image,
+  Alert,
   Dimensions,
-  TouchableOpacity,
-  SafeAreaView
-} from "react-native";
-import { TypingAnimation } from 'react-native-typing-animation';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import * as Animatable from 'react-native-animatable';
+  PixelRatio,
+  Animated,
+} from 'react-native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import {TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {Actions} from 'react-native-router-flux';
+import {material} from 'react-native-typography';
+import ImagePicker from 'react-native-image-picker';
+// import Icon from 'react-native-icons'
+import Names from '../fields.json';
+import axios from 'axios';
 
-export default class SignUpScreen extends React.Component{
-  constructor(props){
-    super(props);
-    this.state={
-      typing_email: false,
-      typing_password: false,
-      animation_login : new Animated.Value(width-40),
-      enable:true
-    }
+var jwtDecode = require('jwt-decode');
+var FONT_BACK_LABEL = 20;
+
+if (PixelRatio.get() <= 2) {
+  FONT_BACK_LABEL = 30;
+}
+const screenWidth = Math.round(Dimensions.get('window').width);
+const screenHeight = Math.round(Dimensions.get('window').height);
+
+export default class SignUpScreen extends Component {
+  static navigationOptions = {
+    header: null,
+  };
+  constructor() {
+    super();
+    this.state = {
+      name: '',
+      avatar: '',
+      email: '',
+      password: '',
+      userId: '',
+      photo: null,
+      success: false,
+      indicator: new Animated.Value(0),
+      wholeHeight: 1,
+      visibleHeight: 0,
+    };
   }
 
-  _foucus(value){
-    if(value=="email"){
-      this.setState({
-        typing_email: true,
-        typing_password: false
-      })
-    }
-    else{
-      this.setState({
-        typing_email: false,
-        typing_password: true
-      })
-    }
+  onClickListener = (viewId) => {
+    Alert.alert('Alert', 'Button pressed ' + viewId);
+  };
+
+  goHome() {
+    Actions.HomeInterface();
   }
 
-  _typing(){
-    return(
-      <TypingAnimation
-        dotColor="#93278f"
-        style={{marginRight:25}}
-      />
-    )
+  goSignIn() {
+    Actions.SignIn();
   }
 
-  _animation(){
-    Animated.timing(
-      this.state.animation_login,
-      {
-        toValue: 40,
-        duration: 250
+  async register() {
+
+    let uri = this.state.photo.uri;
+    let formData = new FormData();
+    let filename = uri.split('/').pop();
+    console.log(filename);
+    formData.append('userImage', {
+      uri: this.state.photo.uri,
+      type: this.state.photo.type,
+      name: this.state.photo.fileName,
+    });
+    formData.append('email', this.state.email);
+    formData.append('password', this.state.password);
+    formData.append('avatar', this.state.avatar);
+    formData.append('name', this.state.name);
+
+    const header = {
+      Accept: 'application/json',
+      'content-type': 'multipart/form-data',
+    };
+    fetch('http://192.168.43.173/user/register', {
+      method: 'POST',
+      headers: header,
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((res) => console.log(res))
+      .catch((err) => console.log('err', err));
+  }
+
+  takePic() {
+    const options = {
+      noData: true,
+    };
+    ImagePicker.launchImageLibrary(options, (response) => {
+      console.log('response', response);
+
+      if (response.uri) {
+        this.setState({photo: response});
       }
-    ).start();
-
-    setTimeout(() => {
-      this.setState({
-        enable:false,
-        typing_email: false,
-        typing_password: false
-      })
-    }, 150);
-     Actions.HomeNavigator()
+    });
   }
 
-  render(){
-    const width = this.state.animation_login;
-    return(
-      <SafeAreaView style={styles.maincontainer}>
-      <ScrollView>
-      <View style={styles.container}>
-        <StatusBar barStyle="light-content" />
-          <View style={styles.header}>
-              <ImageBackground
-                source={require("../assets/header.png")}
-                style={styles.imageBackground}
-              >
-                <Text style={{
-                  color:'white',
-                  fontWeight:'bold',
-                  fontSize:30
-                }}>Welcome Back</Text>
-                <Text style={{
-                  color:'yellow'
-                }}>Sign in to continute</Text>
+  render() {
+    // const {photo} = this.state;
+    const indicatorSize =
+      this.state.wholeHeight > this.state.visibleHeight
+        ? (this.state.visibleHeight * this.state.visibleHeight) /
+          this.state.wholeHeight
+        : this.state.visibleHeight;
 
-              </ImageBackground>
-          </View>
-          <View style={styles.footer}>
-          <Text style={[styles.title,{
-            marginTop:50
-          }]}>Username</Text>
-          <View style={styles.action}>
-              <TextInput
-                placeholder="Your Username.."
-                style={styles.textInput}
-                onFocus={()=>this._foucus("email")}
+    const difference =
+      this.state.visibleHeight > indicatorSize
+        ? this.state.visibleHeight - indicatorSize
+        : 1;
+
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={(width, height) => {
+            this.setState({wholeHeight: height});
+          }}
+          onLayout={({
+            nativeEvent: {
+              layout: {x, y, width, height},
+            },
+          }) => this.setState({visibleHeight: height})}
+          scrollEventThrottle={16}
+          onScroll={Animated.event([
+            {nativeEvent: {contentOffset: {y: this.state.indicator}}},
+          ])}>
+          <View style={styles.container}>
+            <View style={{height: screenHeight * 0.08}}></View>
+            <View>
+              <Text style={material.display1}>{Names.SignUp.SignUp}</Text>
+            </View>
+            <View style={{height: screenHeight * 0.08}}></View>
+            <View style={styles.inputContainer}>
+              <AntDesign
+                style={styles.icon}
+                name="user"
+                size={screenWidth * 0.08}
               />
-              {this.state.typing_email ?
-                this._typing()
-              : null}
-          </View>
+              <TextInput
+                style={styles.inputs}
+                placeholder={Names.SignUp.Name}
+                keyboardType="default"
+                underlineColorAndroid="transparent"
+                onChangeText={(name) => this.setState({name})}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <AntDesign
+                style={styles.icon}
+                name="smileo"
+                size={screenWidth * 0.08}
+              />
 
-                <Text style={[styles.title,{
-                  marginTop:50
-                }]}>E-mail</Text>
-                <View style={styles.action}>
-                    <TextInput
-                      placeholder="Your email.."
-                      style={styles.textInput}
-                      onFocus={()=>this._foucus("email")}
+              <TextInput
+                style={styles.inputs}
+                placeholder={Names.SignUp.Avatar}
+                keyboardType="default"
+                underlineColorAndroid="transparent"
+                onChangeText={(avatar) => this.setState({avatar})}
+              />
+            </View>
+            <TouchableHighlight
+              onPress={() => {
+                this.takePic();
+              }}>
+              <View style={styles.inputContainer}>
+                {this.state.photo != null ? (
+                  // <Image
+                  //   source={{uri: this.state.photo.uri}}
+                  //   style={{width: 50, height: 50,borderRadius:39}}
+                  // />
+                  <View style={{flexDirection: 'row'}}>
+                    <AntDesign
+                      style={styles.icon}
+                      name="camerao"
+                      size={screenWidth * 0.08}
                     />
-                    {this.state.typing_email ?
-                      this._typing()
-                    : null}
-                </View>
-
-                <Text style={[styles.title,{
-                  marginTop:20
-                }]}>Password</Text>
-                <View style={styles.action}>
-                    <TextInput
-                      secureTextEntry
-                      placeholder="Your password.."
-                      style={styles.textInput}
-                      onFocus={()=>this._foucus("password")}
-                    />
-                    {this.state.typing_password ?
-                      this._typing()
-                    : null}
-                </View>
-
-                <Text style={[styles.title,{
-                  marginTop:20
-                }]}>Confirm Password</Text>
-                <View style={styles.action}>
-                    <TextInput
-                      secureTextEntry
-                      placeholder="Confirm Password.."
-                      style={styles.textInput}
-                      onFocus={()=>this._foucus("password")}
-                    />
-                    {this.state.typing_password ?
-                      this._typing()
-                    : null}
-                </View>
-
-                <TouchableOpacity
-                onPress={()=>this._animation()}>
-                  <View style={styles.button_container}>
-                        <Animated.View style={[styles.animation,{
-                          width
-                        }]}>
-                          {this.state.enable ?
-                            <Text style={styles.textLogin}>Login</Text>
-                            :
-                            <Animatable.View
-                            animation="bounceIn"
-                            delay={50}>
-                            <MaterialCommunityIcons name="check"  size={24} />
-                            </Animatable.View>
-                          }
-                        </Animated.View >
+                    <Text style={{alignSelf: 'center'}}>
+                      {this.state.photo.fileName}
+                    </Text>
                   </View>
-                </TouchableOpacity>
+                ) : (
+                  <View style={{flexDirection: 'row'}}>
+                    <AntDesign
+                      style={styles.icon}
+                      name="camerao"
+                      size={screenWidth * 0.08}
+                    />
+                    <Text style={{alignSelf: 'center'}}>
+                      {Names.SignUp.Photo}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </TouchableHighlight>
 
-                <View style={styles.signUp}>
-                      <Text style={{color:'black'}}>already have an account?</Text>
-                      <Text style={{color:'blue'}} onPress={()=>{Actions.LoginScreen()}}> sign in  </Text>
-                </View>
+            <View style={styles.inputContainer}>
+              <AntDesign
+                style={styles.icon}
+                name="mail"
+                size={screenWidth * 0.08}
+              />
+              <TextInput
+                style={styles.inputs}
+                placeholder={Names.SignUp.Email}
+                keyboardType="email-address"
+                underlineColorAndroid="transparent"
+                onChangeText={(email) => this.setState({email})}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <AntDesign
+                style={styles.icon}
+                name="key"
+                size={screenWidth * 0.08}
+              />
+              <TextInput
+                style={styles.inputs}
+                placeholder={Names.SignUp.Password}
+                secureTextEntry={true}
+                underlineColorAndroid="transparent"
+                onChangeText={(password) => this.setState({password})}
+              />
+            </View>
+
+            <TouchableHighlight
+              style={[styles.buttonContainer, styles.loginButton]}
+              onPress={() => this.register()}>
+              <Text style={styles.loginText}>{Names.SignUp.SignUp}</Text>
+            </TouchableHighlight>
+
+            <TouchableHighlight
+              underlayColor="rgba(73,182,77,1,0.9)"
+              style={styles.buttonContainer}
+              onPress={() => this.goSignIn()}>
+              <Text>{Names.SignUp.withAccount}</Text>
+            </TouchableHighlight>
           </View>
-      </View>
-      </ScrollView>
+        </ScrollView>
       </SafeAreaView>
-    )
+    );
   }
 }
 
-const width = Dimensions.get("screen").width;
-
-var styles = StyleSheet.create({
-  maincontainer:{
-        flex:1
-  },
+const styles = StyleSheet.create({
   container: {
-    flex:1,
-    backgroundColor:'white',
-    justifyContent:'center'
-  },
-  header: {
-    flex:1,
-  },
-  footer: {
-    flex:2,
-    padding:20
-  },
-  imageBackground:{
-    flex:1,
-    justifyContent:'center',
-    alignItems:'center',
-    width:"100%",
-    height:'100%'
-  },
-  title: {
-    color:'black',
-    fontWeight:'bold'
-  },
-  action: {
-    flexDirection:'row',
-    borderBottomWidth:1,
-    borderBottomColor:'#f2f2f2'
-  },
-  textInput: {
-    flex:1,
-    marginTop:5,
-    paddingBottom:5,
-    color:'gray'
-  },
-  button_container: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent:'center'
+    backgroundColor: '#DCDCDC',
   },
-  animation: {
-    backgroundColor:'#93278f',
-    paddingVertical:10,
-    marginTop:30,
-    borderRadius:100,
-    justifyContent:'center',
-    alignItems:'center'
+  inputContainer: {
+    borderBottomColor: '#F5FCFF',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
+    borderBottomWidth: 1,
+    width: screenWidth * 0.8,
+    height: screenHeight * 0.1,
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  textLogin: {
-    color:'white',
-    fontWeight:'bold',
-    fontSize:18
+  inputs: {
+    height: screenHeight * 0.2,
+    marginLeft: 16,
+    borderBottomColor: '#FFFFFF',
+    flex: 1,
   },
-  signUp: {
-    flexDirection:'row',
-    justifyContent:'center',
-    marginTop:20
-  }
+  inputIcon: {
+    width: 30,
+    height: 30,
+    marginLeft: 15,
+    justifyContent: 'center',
+  },
+  buttonContainer: {
+    height: 45,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    width: 250,
+    borderRadius: 30,
+  },
+  loginButton: {
+    backgroundColor: '#00b5ec',
+  },
+  loginText: {
+    color: 'white',
+  },
+  icon: {
+    marginLeft: screenWidth * 0.04,
+  },
 });
