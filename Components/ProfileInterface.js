@@ -9,40 +9,22 @@ import {
 } from 'react-native';
 import {Actions} from 'react-native-router-flux';
 import ProfileScreen from './profile/index'
+
 export default class Profile extends Component {
-  goToEdit() {
-    Actions.Edit();
-  }
+                 goToEdit() {
+                   Actions.Edit();
+                 }
 
-  render() {
-    return (
-      <View style={styles.container}>
-<ProfileScreen/>
-        {/* <View style={styles.header}></View>
-        <Image
-          style={styles.avatar}
-          source={require('../assets/profile.jpg')}
-        />
-        <View style={styles.body}>
-          <View style={styles.bodyContent}>
-            <Text style={styles.name}>DeathEater17</Text>
-
-            <TouchableOpacity
-              style={styles.buttonContainer}
-              onPress={() => {
-                this.goToEdit();
-              }}>
-              <Text>Edit Profile</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
-              <Text>Search History</Text>
-            </TouchableOpacity>
-          </View>
-        </View> */}
-      </View>
-    );
-  }
-}
+            
+                 render() {
+                   return (
+                     <View style={styles.container}>
+                       <ProfileScreen />
+             
+                     </View>
+                   );
+                 }
+               }
 
 const styles = StyleSheet.create({
   header: {

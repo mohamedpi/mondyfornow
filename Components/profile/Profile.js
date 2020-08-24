@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
-import {ScrollView, Switch, StyleSheet, Text, View} from 'react-native';
-import {Avatar, ListItem, Icon} from 'react-native-elements';
+import {
+  ScrollView,
+  Switch,
+  StyleSheet,
+  Text,
+  View,
+  AsyncStorage,
+} from 'react-native';
+import {Avatar, ListItem, Icon, Accessory} from 'react-native-elements';
 import PropTypes from 'prop-types';
 
 import BaseIcon from './Icon';
@@ -8,6 +15,8 @@ import Chevron from './Chevron';
 import InfoText from './InfoText';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Actions} from 'react-native-router-flux';
+import Axios from 'axios';
+import ImagePicker from 'react-native-image-picker';
 
 class SettingsScreen extends Component {
   // static propTypes = {
@@ -21,10 +30,27 @@ class SettingsScreen extends Component {
   //   ).isRequired,
   // }
 
-  state = {
-    pushNotifications: true,
-    darkMode: false,
-  };
+  async componentDidMount() {
+    try {
+      const id = await AsyncStorage.getItem('userId');
+      const name = await AsyncStorage.getItem('userName');
+      const email = await AsyncStorage.getItem('userEmail');
+      console.log(name);
+      this.setState({userEmail: email, userName: name});
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  constructor() {
+    super();
+    this.state = {
+      pushNotifications: true,
+      darkMode: false,
+      userName: '',
+      userEmail: '',
+      photo: null,
+    };
+  }
 
   onPressOptions = () => {
     this.props.navigation.navigate('options');
@@ -57,26 +83,64 @@ class SettingsScreen extends Component {
     Actions.CreditCard();
   }
 
-  goToAboutUs(){
-Actions.AboutUs();
+  goToAboutUs() {
+    Actions.AboutUs();
   }
+
+  takePic() {
+    const options = {
+      noData: true,
+    };
+    ImagePicker.launchImageLibrary(options, (response) => {
+      console.log('response', response);
+
+      if (response.uri) {
+        this.setState({photo: response});
+      }
+    });
+        let uri = this.state.photo.uri;
+        let formData = new FormData();
+        let filename = uri.split('/').pop();
+        console.log(filename);
+        formData.append('userImage', {
+          uri: this.state.photo.uri,
+          type: this.state.photo.type,
+          name: this.state.photo.fileName,
+        });
+ const header = {
+   Accept: 'application/json',
+   'content-type': 'multipart/form-data',
+ };
+ fetch('http://192.168.43.124:8082/profile/updatePhoto', {
+   method: 'POST',
+   headers: header,
+   body: formData,
+ })
+   .then((response) => response.json())
+   .then((res) => console.log(res))
+   .catch((err) => console.log('err', err));
+  }
+
   render() {
-    const {
-      avatar,
-      name,
-      emails: [firstEmail],
-    } = this.props;
+    const {avatar} = this.props;
+    const name = this.state.userName;
+    const email = this.state.userEmail;
     return (
       <ScrollView style={styles.scroll}>
         <View style={styles.userRow}>
           <View style={styles.userImage}>
             <Avatar
+              accessory={{style: {backgroundColor: "red"}}}
+              onPress={() => {
+                this.takePic();
+              }}
               rounded
               size="large"
               source={{
-                uri: avatar,
-              }}
-            />
+                uri: this.state.photo == null ? avatar : this.state.photo.uri,
+              }}>
+              <Accessory />
+            </Avatar>
           </View>
           <View>
             <Text style={{fontSize: 16}}>{name}</Text>
@@ -85,7 +149,7 @@ Actions.AboutUs();
                 color: 'gray',
                 fontSize: 16,
               }}>
-              {firstEmail.email}
+              {email}
             </Text>
           </View>
           <View style={{height: 10}}></View>
@@ -323,7 +387,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: 'black',
-    
   },
   logOutView: {
     flexDirection: 'row',

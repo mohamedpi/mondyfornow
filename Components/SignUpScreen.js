@@ -83,7 +83,7 @@ export default class SignUpScreen extends Component {
       Accept: 'application/json',
       'content-type': 'multipart/form-data',
     };
-    fetch('http://192.168.1.213:8082/user/register', {
+    fetch('http://192.168.43.124:8082/user/register', {
       method: 'POST',
       headers: header,
       body: formData,
@@ -170,7 +170,7 @@ export default class SignUpScreen extends Component {
                 onChangeText={(avatar) => this.setState({avatar})}
               />
             </View>
-            <TouchableHighlight
+            {/* <TouchableHighlight
               onPress={() => {
                 this.takePic();
               }}>
@@ -203,7 +203,7 @@ export default class SignUpScreen extends Component {
                   </View>
                 )}
               </View>
-            </TouchableHighlight>
+            </TouchableHighlight> */}
 
             <View style={styles.inputContainer}>
               <AntDesign

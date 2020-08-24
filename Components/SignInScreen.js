@@ -24,6 +24,8 @@ import axios from 'axios';
 // import FingerprintScanner from 'react-native-fingerprint-scanner';
 import TouchID from 'react-native-touch-id';
 import Names from '../fields.json';
+import * as Keychain from 'react-native-keychain';
+
 
 var jwtDecode = require('jwt-decode');
 
@@ -79,36 +81,17 @@ export default class LoginView extends Component {
       wrongPass: false,
       isVerified: true,
       res: 200,
-
-      // typing_email: false,
-      // typing_password: false,
+      userName:"",
+      userEmail:"",
+      touchIdEnabled:true
     };
   }
-  // _focus(value){
-  //   if(value=="email"){
-  //     this.setState({
-  //       typing_email: true,
-  //       typing_password: false
-  //     })
-  //   }
-  //   else{
-  //     this.setState({
-  //       typing_email: false,
-  //       typing_password: true
-  //     })
-  //   }
-  // }
 
-  // _typing(){
-  //   return(
-  //     <TypingAnimation
-  //       dotColor="black"
-  //       style={{marginRight:25}}
-  //     />
-  //   )
-  // }
 
   _pressHandler() {
+     Keychain.getGenericPassword()   // Retrieve the credentials from the keychain
+    .then(credentials => {
+      const { email, password } = credentials;
     TouchID.isSupported()
       .then((success) => {
         // Success code
@@ -123,11 +106,14 @@ export default class LoginView extends Component {
     TouchID.authenticate('Scan your finger ', optionalConfigObject)
       .then((success) => {
         // Alert.alert('Authenticated Successfully');
+        // this.login(email, password)
+        console.log(success)
         Actions.HomeInterface();
       })
       .catch((error) => {
         Alert.alert('Authentication Failed');
       });
+    })
   }
 
   goSignUp() {
@@ -138,42 +124,60 @@ export default class LoginView extends Component {
     var re = new RegExp(pattern);
     return re.test(email);
   }
+async login(email, password){
+  try {
+    const res = await axios.post('http://192.168.43.124:8082/user/login', {
+      email: email,
+      password: password,
+    });
+    var token = res.data.token;
+    var user = res.data.user;
+    console.log(token)
+    console.log(user)
+
+    if (res.status == 200) {
+      var decoded = jwtDecode(token);
+      console.log(decoded);
+      this.setState({touchIdEnabled: user.touchIdEnabled && !user.firstTime});
+      Keychain.setGenericPassword(email, password); // store the credentials in the keychain
+
+      try {
+        const resp = await axios.get(
+          `http://192.168.43.124:8082/user/getUser/?id=${decoded._id}`,
+        );
+        this.setState({userName: resp.data.name, userEmail: resp.data.email});
+      } catch (error) {
+        console.log(error);
+      }
+
+      try {
+        await AsyncStorage.setItem('userId', decoded._id);
+        await AsyncStorage.setItem('token', token);
+        console.log(this.state.userEmail);
+        await AsyncStorage.setItem('userName', this.state.userName);
+        await AsyncStorage.setItem('userEmail', this.state.userEmail);
+      } catch (error) {
+        console.log(error);
+      }
+      Actions.HomeInterface();
+    }
+  } catch (err) {
+    console.log(err.message);
+    if (err.response.status == 400)
+      this.setState({emailCorrect: false, passwordCorrect: false});
+    if (err.response.status == 401) this.setState({isVerified: false});
+  }
+}
+
 
   async goHome() {
-    console.warn(this.state.email + this.state.password);
     if (!this.validateEmail(this.state.email)) {
       this.setState({wrongMail: true});
       return false;
     } else {
       this.setState({wrongMail: false});
     }
-    var ress;
-    try {
-      const res = await axios.post('http://192.168.1.213:8082/user/login', {
-        email: this.state.email,
-        password: this.state.password,
-      });
-      var token = res.data;
-      if (res.status == 200) {
-        var decoded = jwtDecode(token);
-        console.log(decoded);
-
-        try {
-          await AsyncStorage.setItem('userId', decoded._id);
-        } catch (error) {
-          console.log(error);
-        }
-        console.log(res.status);
-        Actions.HomeInterface();
-      }
-    } catch (err) {
-      console.log(err);
-      if (err.response.status == 400)
-        this.setState({emailCorrect: false, passwordCorrect: false});
-      if (err.response.status == 401) 
-        this.setState({isVerified: false});
-
-    }
+  this.login(this.state.email,this.state.password);
   }
 
   render() {
@@ -246,11 +250,11 @@ export default class LoginView extends Component {
               <Text style={styles.loginText}>{Names.SignIn.SignIn}</Text>
             </TouchableHighlight>
 
-            <TouchableHighlight
+          {this.state.touchIdEnabled?  <TouchableHighlight
               style={[styles.buttonContainer, styles.loginButton]}
               onPress={this._pressHandler}>
               <Text style={styles.loginText}>{Names.SignIn.FingerPrint}</Text>
-            </TouchableHighlight>
+            </TouchableHighlight>: <Text></Text>}
             <TouchableHighlight
               underlayColor="rgba(73,182,77,1,0.9)"
               style={styles.buttonContainer}

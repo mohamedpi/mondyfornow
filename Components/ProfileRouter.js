@@ -4,10 +4,12 @@ import {Router, Stack, Scene} from 'react-native-router-flux';
 import Language from './profile/language'
 import Profile from './ProfileInterface'
 import Edit from './profile/EditProfile'
-import SplashScreen from './AuthInterface'
+import SplashScreen from './AuthRouter'
 import creditCard from './profile/creditCard'
 import aboutUs from './profile/aboutUs'
+
 export default class Route extends Component {
+  
   render() {
     return (
       <Router>

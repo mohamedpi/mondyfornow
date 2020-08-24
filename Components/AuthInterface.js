@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
+  AsyncStorage,
 } from 'react-native';
 import SplashScreen from './SplashScreen';
 import * as Animatable from 'react-native-animatable';
@@ -16,8 +17,8 @@ import AwesomeButton from 'react-native-really-awesome-button';
 // import { createStackNavigator } from '@react-navigation/stack';
 import {Actions} from 'react-native-router-flux';
 import Names from '../fields.json';
-
-
+// import NamesFR from '../fieldsFR.json';
+import axios from 'axios'
 
 const image = require('../assets/logo.jpg');
 const cover = require('../assets/cover.jpg');
@@ -25,8 +26,41 @@ const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
 export default class SignInInterface extends Component {
+  constructor() {
+    super();
+    this.state = {
+      language: {
+        // "en": NamesEN,
+        // "fr":NamesFR
+      },
+
+    };
+  }
+
+  async componentDidMount() {
+    try {
+      const id = await AsyncStorage.getItem('userId');
+
+      try {
+        const resp = await axios.get(
+          `http://192.168.43.124:8082/user/getUserLanguage/?id=${id}`,
+        );
+        this.setState({language: resp.data});
+        console.log(this.state.language);
+      } catch (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   render() {
+  // if (this.state.language == 'en') {
+  //  var Names=this.state.language.en
+  // } else if (this.state.language == 'fr') {
+  //  var Names = this.state.language.fr;
+  // }
     return (
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
@@ -104,7 +138,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     paddingVertical: screenHeight * 0.1,
   },
- 
+
   SignInButton: {
     alignSelf: 'center',
   },

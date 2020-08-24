@@ -22,28 +22,40 @@ export default class LikedInterface extends Component {
                  }
                  async componentDidMount() {
                    const resp = await axios.get(
-                     'http://192.168.1.213:8082/games/showFavorites',
+                     'http://192.168.43.124:8082/games/showFavorites',
                    );
-                   console.log(resp);
-                   console.log(resp.data);
+    
                    this.setState({list: resp.data});
                  }
 
                  _onRefresh = () =>  {
                    this.setState({refreshing: true});
                    axios
-                     .get('http://192.168.1.213:8082/games/showFavorites')
+                     .get('http://192.168.43.124:8082/games/showFavorites')
                      .then((resp) => {
                        this.setState({refreshing: false, list: resp.data});
                      });
                  };
 
-                 unfavorite(id){
-                   console.log(id);
-                  axios.delete(
-                    'http://192.168.1.213:8082/games/removeFavorite',
-                    {_id: id},
-                  );
+                async unfavorite(id){
+                  console.log(id);
+                 try {
+                  // resp = await axios.delete(
+                  //   'http://192.168.1.37:8082/games/removeFavorite',
+                  //   {_id: id},
+                  // );
+                  //  console.log(resp.data)
+                      axios
+                        .delete(
+                          `http://192.168.43.124:8082/games/removeFavorite/?id=${id}`,
+                        )
+                        .then((res) => {
+                          console.log(res);
+                          console.log(res.data);
+                        });
+                 } catch (error) {
+                   console.log(error)
+                 } 
                  }
 
                  render() {
@@ -61,30 +73,37 @@ export default class LikedInterface extends Component {
                              <Text style={styles.textStyle}>Your wishlist</Text>
                            </View>
 
-                           {this.state.list.map((l, i) => (
-                             <ListItem
-                               key={i}
-                               leftAvatar={{
-                                 source: {
-                                   uri:
-                                     'http://192.168.1.213:8082/' + l.gameImage,
-                                 },
-                                 rounded: false,
-                               }}
-                               title={l.name}
-                               subtitle={l.details}
-                               bottomDivider
-                               rightIcon={
-                                 <AntDesign
-                                   name="heart"
-                                   color="red"
-                                    onPress={()=>{
-                                      console.log("hi")
-                                      this.unfavorite(l._id)}}
-                                 />
-                               }
-                             />
-                           ))}
+                           {this.state.list ? (
+                             this.state.list.map((l, i) => (
+                               <ListItem
+                                 key={i}
+                                 leftAvatar={{
+                                   source: {
+                                     uri:
+                                       'http://192.168.43.124:8082/' +
+                                       l.gameImage,
+                                   },
+                                   rounded: false,
+                                 }}
+                                 title={l.name}
+                                 subtitle={l.details}
+                                 bottomDivider
+                                 rightIcon={
+                                   <AntDesign
+                                     name="heart"
+                                     color="red"
+                                     size={20}
+                                     onPress={() => {
+                                       console.log('hi');
+                                       this.unfavorite(l._id);
+                                     }}
+                                   />
+                                 }
+                               />
+                             ))
+                           ) : (
+                             <Text>You have nothing in your wishlist</Text>
+                           )}
                          </View>
                        </ScrollView>
                      </>
