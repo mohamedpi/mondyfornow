@@ -6,15 +6,11 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
-  AsyncStorag
 } from 'react-native';
 import {ListItem} from 'react-native-elements';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import axios from 'axios';
-
-
-
 
 export default class LikedInterface extends Component {
                  constructor() {
@@ -26,38 +22,42 @@ export default class LikedInterface extends Component {
                  }
                  async componentDidMount() {
                    const resp = await axios.get(
-                     'http://192.168.1.213:8082/games/showFavorites',
+                     'http://192.168.43.124:8082/games/showFavorites',
                    );
-                   console.log(resp);
-                   console.log(resp.data);
+
                    this.setState({list: resp.data});
                  }
 
+                 _onRefresh = () =>  {
+                   this.setState({refreshing: true});
+                   axios
+                     .get('http://192.168.43.124:8082/games/showFavorites')
+                     .then((resp) => {
+                       this.setState({refreshing: false, list: resp.data});
+                     });
+                 };
 
-
-                 unfavorite(id){
-                   console.log(id);
-                  axios.delete(
-                    'http://192.168.1.213:8082/games/removeFavorite',
-                    {_id: id},
-                  );
+                async unfavorite(id){
+                  console.log(id);
+                 try {
+                  // resp = await axios.delete(
+                  //   'http://192.168.1.37:8082/games/removeFavorite',
+                  //   {_id: id},
+                  // );
+                  //  console.log(resp.data)
+                      axios
+                        .delete(
+                          `http://192.168.43.124:8082/games/removeFavorite/?id=${id}`,
+                        )
+                        .then((res) => {
+                          console.log(res);
+                          console.log(res.data);
+                        });
+                 } catch (error) {
+                   console.log(error)
                  }
-                 _retrieveData = async () => {
-  try {
-    const value = await AsyncStorage.getItem('token');
-    if (value !== null) {
-      // We have data!!
-      this.setState({list : value})
-    }
-  } catch (error) {
-    // Error retrieving data
-  }
-};
-_onRefresh = () =>  {
-  this.setState({refreshing: true});
-  this.setState({refreshing: false, list: _retrieveData()});
+                 }
 
-};
                  render() {
                    return (
                      <>
@@ -70,33 +70,40 @@ _onRefresh = () =>  {
                          }>
                          <View style={styles.container}>
                            <View>
-                             <Text style={styles.textStyle}>Your wishlist</Text>
+                             <Text style={styles.textStyle}>Your WishList</Text>
                            </View>
 
-                           {this.state.list.map((l, i) => (
-                             <ListItem
-                               key={i}
-                               leftAvatar={{
-                                 source: {
-                                   uri:
-                                     "",
-                                 },
-                                 rounded: false,
-                               }}
-                               title={l.title}
-                               subtitle={l.details}
-                               bottomDivider
-                               rightIcon={
-                                 <AntDesign
-                                   name="heart"
-                                   color="red"
-                                    onPress={()=>{
-                                      console.log("hi")
-                                      this.unfavorite(l._id)}}
-                                 />
-                               }
-                             />
-                           ))}
+                           {(this.state.list.length !==0) ? (
+                             this.state.list.map((l, i) => (
+                               <ListItem
+                                 key={i}
+                                 leftAvatar={{
+                                   source: {
+                                     uri:
+                                       'http://192.168.43.124:8082/' +
+                                       l.gameImage,
+                                   },
+                                   rounded: false,
+                                 }}
+                                 title={l.name}
+                                 subtitle={l.details}
+                                 bottomDivider
+                                 rightIcon={
+                                   <AntDesign
+                                     name="heart"
+                                     color="red"
+                                     size={20}
+                                     onPress={() => {
+                                       console.log('hi');
+                                       this.unfavorite(l._id);
+                                     }}
+                                   />
+                                 }
+                               />
+                             ))
+                           ) : (
+                             <Text>You have nothing in your wishlist</Text>
+                           )}
                          </View>
                        </ScrollView>
                      </>

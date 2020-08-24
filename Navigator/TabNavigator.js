@@ -13,6 +13,7 @@ import SearchInterface from "../Components/SearchInterface"
 import OfferItem from "../Components/OfferItem"
 import LoginScreen from "../Components/SignInScreen"
 import MyHomeStack from "./StackNavigator"
+import ProfileRouter from "./profileRouter"
 
 const Tab =  createMaterialTopTabNavigator();
 
@@ -43,12 +44,7 @@ function TabNavigator()
           ),
         }} />
 
-         <Tab.Screen name="OfferItem" component={CatalogInterface}  options={{
-           tabBarLabel: 'Catalog',
-           tabBarIcon: ({ color, size }) => (
-             <MaterialCommunityIcons name="details" color={color} size={30} />
-           ),
-         }}/>
+
 
          <Tab.Screen name="Liked" component={LikedInterface}
          options={{
@@ -65,7 +61,7 @@ function TabNavigator()
             <MaterialCommunityIcons name="cloud-search" color={color} size={30} />
           ),
         }}/>
-         <Tab.Screen name="Profile" component={ProfileInterface}  options={{
+         <Tab.Screen name="Profile" component={ProfileRouter}  options={{
            tabBarLabel: 'Profile',
            activeBackgroundColor: "red",
            tabBarIcon: ({ color, size }) => (

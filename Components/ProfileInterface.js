@@ -1,29 +1,94 @@
-import React from "react"
-import {View,Text,Image,StyleSheet} from "react-native"
+import React, {Component} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import {Actions} from 'react-native-router-flux';
+import ProfileScreen from './profile/index'
+
+export default class Profile extends Component {
+                 goToEdit() {
+                   Actions.Edit();
+                 }
 
 
-function ProfileInterface(){
-  return(
-    <>
-       <View style={styles.container}>
-          <Text style={styles.textStyle}>welcome to Profile page</Text>
-       </View>
-    </>
-  )
-}
+                 render() {
+                   return (
+                     <View style={styles.container}>
+                       <ProfileScreen />
+
+                     </View>
+                   );
+                 }
+               }
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    padding:0,
-    backgroundColor:"#121419"
-  },  textStyle:{
-      paddingHorizontal:15,
-      marginVertical:15,
-      fontFamily:"GlueGun-GW8Z",
-      fontSize:25,
-      color:"#dce0e9"
-    },
-})
-
-export default ProfileInterface
+  header: {
+    backgroundColor: '#708090',
+    height: 200,
+    borderBottomLeftRadius: 200,
+    borderBottomEndRadius: 20,
+  },
+  avatar: {
+    width: 130,
+    height: 130,
+    borderRadius: 60,
+    borderWidth: 4,
+    borderColor: 'red',
+    marginBottom: 10,
+    alignSelf: 'center',
+    position: 'absolute',
+    marginTop: 130,
+  },
+  name: {
+    fontSize: 22,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  body: {
+    marginTop: 40,
+  },
+  bodyContent: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 30,
+  },
+  name: {
+    fontSize: 28,
+    color: '#696969',
+    fontWeight: '600',
+  },
+  info: {
+    fontSize: 16,
+    color: '#00BFFF',
+    marginTop: 10,
+  },
+  description: {
+    fontSize: 16,
+    color: '#696969',
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    marginTop: 10,
+    height: 45,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    width: 250,
+    borderRadius: 30,
+    backgroundColor: '#00b5ec',
+  },
+  textStyle: {
+    paddingHorizontal: 15,
+    marginVertical: 15,
+    fontFamily: 'GlueGun-GW8Z',
+    fontSize: 25,
+    color: '#dce0e9',
+  },
+});

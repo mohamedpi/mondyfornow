@@ -34,6 +34,7 @@ import SignInRouter from "./Navigator/LoginRouter"
 import AuthRouter from './Navigator/AuthRouter'
 
 const App: () => React$Node = () => {
+  console.disableYellowBox = true;
   return (
     <>
     <Provider store={store}>

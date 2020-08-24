@@ -13,7 +13,7 @@ function HomeInterface(props){
   useEffect(()=>{
     async function getData()
    {
-    const response = await Axios.get("https://galactech.herokuapp.com/games");
+    const response = await Axios.get("http://192.168.43.173:5000/games");
     props.getGames(response.data)
    }
    getData()

@@ -65,35 +65,33 @@ export default class SignUpScreen extends Component {
 
   async register() {
 
-    let uri = this.state.photo.uri;
-    let formData = new FormData();
-    let filename = uri.split('/').pop();
-    console.log(filename);
-    formData.append('userImage', {
-      uri: this.state.photo.uri,
-      type: this.state.photo.type,
-      name: this.state.photo.fileName,
-    });
-    formData.append('email', this.state.email);
-    formData.append('password', this.state.password);
-    formData.append('avatar', this.state.avatar);
-    formData.append('name', this.state.name);
+  //  let uri = this.state.photo.uri;
 
-    const header = {
-      Accept: 'application/json',
-      'content-type': 'multipart/form-data',
-    };
-    fetch('http://192.168.43.173/user/register', {
-      method: 'POST',
-      headers: header,
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((res) => console.log(res))
-      .catch((err) => console.log('err', err));
+    //let filename = uri.split('/').pop();
+    //console.log(filename);
+    //formData.append('userImage', {
+      //uri: this.state.photo.uri,
+      //type: this.state.photo.type,
+      //name: this.state.photo.fileName,
+    //});
+
+
+    try {
+        const resp = await axios.post('http://192.168.43.173:5000/user/register', {
+          email: this.state.email,
+          password: this.state.password,
+          avatar: this.state.avatar,
+          name: this.state.name,
+        });
+  if(resp.status==200){
+    console.log("success")
+  }
+      } catch (error) {
+        console.log(error);
+      }
   }
 
-  takePic() {
+/*  takePic() {
     const options = {
       noData: true,
     };
@@ -104,7 +102,7 @@ export default class SignUpScreen extends Component {
         this.setState({photo: response});
       }
     });
-  }
+  }*/
 
   render() {
     // const {photo} = this.state;
@@ -170,7 +168,7 @@ export default class SignUpScreen extends Component {
                 onChangeText={(avatar) => this.setState({avatar})}
               />
             </View>
-            <TouchableHighlight
+            {/* <TouchableHighlight
               onPress={() => {
                 this.takePic();
               }}>
@@ -203,7 +201,7 @@ export default class SignUpScreen extends Component {
                   </View>
                 )}
               </View>
-            </TouchableHighlight>
+            </TouchableHighlight> */}
 
             <View style={styles.inputContainer}>
               <AntDesign

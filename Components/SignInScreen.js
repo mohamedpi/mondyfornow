@@ -163,11 +163,7 @@ export default class LoginView extends Component {
         } catch (error) {
           console.log(error);
         }
-        try {
-          await AsyncStorage.setItem('token', decoded);
-        } catch (error) {
-          console.log(error);
-        }
+
         console.log(res.status);
         Actions.HomeInterface();
       }
