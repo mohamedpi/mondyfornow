@@ -7,6 +7,7 @@ import Edit from '../Components/profile/EditProfile'
 import SplashScreen from './AuthRouter'
 import creditCard from '../Components/profile/creditCard'
 import aboutUs from '../Components/profile/aboutUs'
+import changePass from '../Components/profile/changePass'
 
 export default class Route extends Component {
 
@@ -38,6 +39,11 @@ export default class Route extends Component {
             key="AboutUs"
             component={aboutUs}
             title="About Us"
+          />
+          <Scene
+            key="changePass"
+            component={changePass}
+            title="Change password" 
           />
         </Scene>
       </Router>

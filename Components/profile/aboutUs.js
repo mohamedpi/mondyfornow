@@ -43,6 +43,7 @@ export default class AboutUs extends Component {
                   }}
                 />
               </View>
+              
               <View style={{height:screenHeight*0.1}}></View>
               <View>
                 <Text

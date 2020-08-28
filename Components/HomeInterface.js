@@ -13,7 +13,7 @@ function HomeInterface(props){
   useEffect(()=>{
     async function getData()
    {
-    const response = await Axios.get("http://192.168.43.173:5000/games");
+    const response = await Axios.get('http://192.168.1.39:8082/games');
     props.getGames(response.data)
    }
    getData()

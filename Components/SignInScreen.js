@@ -24,6 +24,8 @@ import axios from 'axios';
 // import FingerprintScanner from 'react-native-fingerprint-scanner';
 import TouchID from 'react-native-touch-id';
 import Names from '../fields.json';
+import LinearGradient from 'react-native-linear-gradient';
+import {Icon} from 'react-native-elements';
 
 var jwtDecode = require('jwt-decode');
 
@@ -38,232 +40,351 @@ if (PixelRatio.get() <= 2) {
 import {BackHandler} from 'react-native';
 
 export default class LoginView extends Component {
-  // static navigationOptions = {
-  //   header: null,
-  // };
+                 // static navigationOptions = {
+                 //   header: null,
+                 // };
 
-  componentWillMount() {
-    BackHandler.addEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
-  }
+                 componentWillMount() {
+                   BackHandler.addEventListener(
+                     'hardwareBackPress',
+                     this.handleBackButtonClick,
+                   );
+                 }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
-  }
+                 componentWillUnmount() {
+                   BackHandler.removeEventListener(
+                     'hardwareBackPress',
+                     this.handleBackButtonClick,
+                   );
+                 }
 
-  handleBackButtonClick() {
-    // Alert.alert('COMPONENT DID MOUNT');
-    this.props.navigation.goBack(null);
-    return true;
-  }
+                 handleBackButtonClick() {
+                   // Alert.alert('COMPONENT DID MOUNT');
+                   this.props.navigation.goBack(null);
+                   return true;
+                 }
 
-  constructor(props) {
-    super(props);
-    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+                 constructor(props) {
+                   super(props);
+                   this.handleBackButtonClick = this.handleBackButtonClick.bind(
+                     this,
+                   );
 
-    this.state = {
-      name: '',
-      avatar: '',
-      email: '',
-      password: '',
-      userId: '',
-      success: false,
-      emailCorrect: true,
-      passwordCorrect: true,
-      wrongMail: false,
-      wrongPass: false,
-      isVerified: true,
-      res: 200,
+                   this.state = {
+                     name: '',
+                     avatar: '',
+                     email: '',
+                     password: '',
+                     userId: '',
+                     success: false,
+                     emailCorrect: true,
+                     passwordCorrect: true,
+                     wrongMail: false,
+                     wrongPass: false,
+                     isVerified: true,
+                     passVisible: true,
+                     res: 200,
 
-      // typing_email: false,
-      // typing_password: false,
-    };
-  }
-  // _focus(value){
-  //   if(value=="email"){
-  //     this.setState({
-  //       typing_email: true,
-  //       typing_password: false
-  //     })
-  //   }
-  //   else{
-  //     this.setState({
-  //       typing_email: false,
-  //       typing_password: true
-  //     })
-  //   }
-  // }
+                     // typing_email: false,
+                     // typing_password: false,
+                   };
+                 }
+                 // _focus(value){
+                 //   if(value=="email"){
+                 //     this.setState({
+                 //       typing_email: true,
+                 //       typing_password: false
+                 //     })
+                 //   }
+                 //   else{
+                 //     this.setState({
+                 //       typing_email: false,
+                 //       typing_password: true
+                 //     })
+                 //   }
+                 // }
 
-  // _typing(){
-  //   return(
-  //     <TypingAnimation
-  //       dotColor="black"
-  //       style={{marginRight:25}}
-  //     />
-  //   )
-  // }
+                 // _typing(){
+                 //   return(
+                 //     <TypingAnimation
+                 //       dotColor="black"
+                 //       style={{marginRight:25}}
+                 //     />
+                 //   )
+                 // }
 
-  _pressHandler() {
-    TouchID.isSupported()
-      .then((success) => {
-        // Success code
-        console.log('supported');
-      })
-      .catch((error) => {
-        // Failure code
-        console.log(error);
-        Alert.alert('Device does not support touch ID');
-      });
+                 _pressHandler() {
+                   TouchID.isSupported()
+                     .then((success) => {
+                       // Success code
+                       console.log('supported');
+                     })
+                     .catch((error) => {
+                       // Failure code
+                       console.log(error);
+                       Alert.alert('Device does not support touch ID');
+                     });
 
-    TouchID.authenticate('Scan your finger ', optionalConfigObject)
-      .then((success) => {
-        // Alert.alert('Authenticated Successfully');
-        Actions.HomeInterface();
-      })
-      .catch((error) => {
-        Alert.alert('Authentication Failed');
-      });
-  }
+                   TouchID.authenticate(
+                     'Scan your finger ',
+                     optionalConfigObject,
+                   )
+                     .then((success) => {
+                       // Alert.alert('Authenticated Successfully');
+                       Actions.HomeInterface();
+                     })
+                     .catch((error) => {
+                       Alert.alert('Authentication Failed');
+                     });
+                 }
 
-  goSignUp() {
-    Actions.SignUp();
-  }
-  validateEmail(email) {
-    var pattern = '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$';
-    var re = new RegExp(pattern);
-    return re.test(email);
-  }
+                 goSignUp() {
+                   Actions.SignUp();
+                 }
+                 validateEmail(email) {
+                   var pattern =
+                     '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$';
+                   var re = new RegExp(pattern);
+                   return re.test(email);
+                 }
+             
 
-  async goHome() {
-    console.warn(this.state.email + this.state.password);
-    if (!this.validateEmail(this.state.email)) {
-      this.setState({wrongMail: true});
-      return false;
-    } else {
-      this.setState({wrongMail: false});
-    }
-    var ress;
-    try {
-      const res = await axios.post('http://192.168.43.173:5000/user/login', {
-        email: this.state.email,
-        password: this.state.password,
-      });
-      var token = res.data;
-      if (res.status == 200) {
-        var decoded = jwtDecode(token);
-        console.log(decoded);
+                 // async goHome() {
+                 //   console.warn(this.state.email + this.state.password);
+                 //   if (!this.validateEmail(this.state.email)) {
+                 //     this.setState({wrongMail: true});
+                 //     return false;
+                 //   } else {
+                 //     this.setState({wrongMail: false});
+                 //   }
+                 //   try {
+                 //     const res = await axios.post('http://192.168.1.39:8082/user/login', {
+                 //       email: this.state.email,
+                 //       password: this.state.password,
+                 //     });
+                 //     var token = res.data;
+                 //     if (res.status == 200) {
+                 //       var decoded = jwtDecode(token);
+                 //       console.log(decoded);
 
-        try {
-          await AsyncStorage.setItem('userId', decoded._id);
-        } catch (error) {
-          console.log(error);
-        }
+                 //       try {
+                 //         await AsyncStorage.setItem('userId', decoded._id);
+                 //       } catch (error) {
+                 //         console.log(error);
+                 //       }
 
-        console.log(res.status);
-        Actions.HomeInterface();
-      }
-    } catch (err) {
-      console.log(err);
-      if (err.response.status == 400)
-        this.setState({emailCorrect: false, passwordCorrect: false});
-      if (err.response.status == 401)
-        this.setState({isVerified: false});
+                 //       console.log(res.status);
+                 //       Actions.HomeInterface();
+                 //     }
+                 //   } catch (err) {
+                 //     console.log(err);
+                 //     if(err.response)
+                 //    { if (err.response.status == 400)
+                 //       this.setState({emailCorrect: false, passwordCorrect: false});
+                 //     if (err.response.status == 401)
+                 //       this.setState({isVerified: false});}
 
-    }
-  }
+                 //   }
+                 // }
 
-  render() {
-    const error = 'Email or Password is wrong';
-    const errorMail = 'Please write a correct mail address';
-    const verifyMail = 'Please verify your mail address first ';
-    return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView>
-          <View style={styles.container}>
-            <View style={{height: screenHeight * 0.08}}></View>
-            <View>
-              <Text style={material.display1}>{Names.SignIn.SignIn}</Text>
-            </View>
-            <View style={{height: screenHeight * 0.08}}></View>
-            <Text style={{color: 'red'}}>
-              {!this.state.emailCorrect ? error : ''}
-            </Text>
-            <Text style={{color: 'red'}}>
-              {this.state.wrongMail ? errorMail : ''}
-            </Text>
-            <Text style={{color: 'red'}}>
-              {!this.state.isVerified ? verifyMail : ''}
-            </Text>
-            <View style={styles.inputContainer}>
-              <AntDesign
-                style={styles.icon}
-                name="mail"
-                size={screenWidth * 0.08}
-              />
+                 async login(email, password) {
+                   try {
+                     const res = await axios.post(
+                       'http://192.168.1.37:8082/user/login',
+                       {
+                         email: email,
+                         password: password,
+                       },
+                     );
+                     var token = res.data.token;
+                     var user = res.data.user;
+                     console.log(token);
+                     console.log(user);
 
-              <TextInput
-                style={
-                  (styles.inputs,
-                  {borderColor: !this.state.emailCorrect ? 'red' : 'black'})
-                }
-                onSubmitEditing={() => this.password.focus()}
-                placeholder={Names.SignIn.Email}
-                keyboardType="email-address"
-                underlineColorAndroid="transparent"
-                onChangeText={(email) => {
-                  this.setState({email});
-                }}
-              />
-              {this.state.typing_email ? this._typing() : null}
-            </View>
-            {/* <Text>{!this.state.passwordCorrect ? error : ''}</Text> */}
-            <View style={styles.inputContainer}>
-              <AntDesign
-                style={styles.icon}
-                name="key"
-                size={screenWidth * 0.08}
-              />
-              <TextInput
-                ref={(password) => (this.password = password)}
-                style={styles.inputs}
-                placeholder={Names.SignIn.Password}
-                secureTextEntry={true}
-                underlineColorAndroid="transparent"
-                onChangeText={(password) => this.setState({password})}
-              />
-              {this.state.typing_email ? this._typing() : null}
-            </View>
+                     if (res.status == 200) {
+                       var decoded = jwtDecode(token);
+                       console.log(decoded);
 
-            <TouchableHighlight
-              style={[styles.buttonContainer, styles.loginButton]}
-              onPress={() => {
-                this.goHome();
-              }}>
-              <Text style={styles.loginText}>{Names.SignIn.SignIn}</Text>
-            </TouchableHighlight>
+                       try {
+                         const resp = await axios.get(
+                           `http://192.168.1.37:8082/user/getUser/?id=${decoded._id}`,
+                         );
+                         this.setState({
+                           userName: resp.data.name,
+                           userEmail: resp.data.email,
+                         });
+                       } catch (error) {
+                         console.log(error);
+                       }
 
-            <TouchableHighlight
-              style={[styles.buttonContainer, styles.loginButton]}
-              onPress={this._pressHandler}>
-              <Text style={styles.loginText}>{Names.SignIn.FingerPrint}</Text>
-            </TouchableHighlight>
-            <TouchableHighlight
-              underlayColor="rgba(73,182,77,1,0.9)"
-              style={styles.buttonContainer}
-              onPress={() => this.goSignUp()}>
-              <Text>{Names.SignIn.noAccount}</Text>
-            </TouchableHighlight>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-}
+                       try {
+                         await AsyncStorage.setItem('userId', decoded._id);
+                         await AsyncStorage.setItem('token', token);
+                         await AsyncStorage.setItem('isLogged', '1');
+                         console.log(this.state.userEmail);
+                         await AsyncStorage.setItem(
+                           'userName',
+                           this.state.userName,
+                         );
+                         await AsyncStorage.setItem(
+                           'userEmail',
+                           this.state.userEmail,
+                         );
+                       } catch (error) {
+                         console.log(error);
+                       }
+                       Actions.HomeInterface();
+                     }
+                   } catch (err) {
+                     console.log(err.message);
+                     if (err.response.status == 400)
+                       this.setState({
+                         emailCorrect: false,
+                         passwordCorrect: false,
+                       });
+                     if (err.response.status == 401)
+                       this.setState({isVerified: false});
+                   }
+                 }
+
+                 async goHome() {
+                   if (!this.validateEmail(this.state.email)) {
+                     this.setState({wrongMail: true});
+                     return false;
+                   } else {
+                     this.setState({wrongMail: false});
+                   }
+                   this.login(this.state.email, this.state.password);
+                 }
+                 render() {
+                   const error = 'Email or Password is wrong';
+                   const errorMail = 'Please write a correct mail address';
+                   const verifyMail = 'Please verify your mail address first ';
+                   return (
+                     <SafeAreaView style={styles.container}>
+                       <ScrollView>
+                         <View style={styles.container}>
+                           <LinearGradient
+                             colors={['#4f7799', '#334e85', '#16265a']}
+                             style={styles.linearGradient}>
+                             <View style={{height: screenHeight * 0.08}}></View>
+                             <View>
+                               <Text style={styles.signInText}>
+                                 {Names.SignIn.SignIn}
+                               </Text>
+                             </View>
+                             <View style={{height: screenHeight * 0.05}}></View>
+                             <Text style={{color: 'red'}}>
+                               {!this.state.emailCorrect ? error : null}
+                             </Text>
+                             <Text style={{color: 'red'}}>
+                               {this.state.wrongMail ? errorMail : null}
+                             </Text>
+                             <Text style={{color: 'red'}}>
+                               {!this.state.isVerified ? verifyMail : null}
+                             </Text>
+                             <View style={styles.inputContainer}>
+                               <AntDesign
+                                 style={styles.icon}
+                                 name="mail"
+                                 size={screenWidth * 0.08}
+                               />
+
+                               <TextInput
+                                 style={
+                                   (styles.inputs,
+                                   {
+                                     borderColor: !this.state.emailCorrect
+                                       ? 'red'
+                                       : 'black',
+                                   })
+                                 }
+                                 onSubmitEditing={() => this.password.focus()}
+                                 placeholder={Names.SignIn.Email}
+                                 keyboardType="email-address"
+                                 underlineColorAndroid="transparent"
+                                 onChangeText={(email) => {
+                                   this.setState({email});
+                                 }}
+                               />
+                               {this.state.typing_email ? this._typing() : null}
+                             </View>
+                             {/* <Text>{!this.state.passwordCorrect ? error : ''}</Text> */}
+                             <View style={styles.inputContainer}>
+                               <AntDesign
+                                 style={styles.icon}
+                                 name="key"
+                                 size={screenWidth * 0.08}
+                               />
+                               <TextInput
+                                 ref={(password) => (this.password = password)}
+                                 style={styles.inputs}
+                                 placeholder={Names.SignIn.Password}
+                                 secureTextEntry={this.state.passVisible}
+                                 underlineColorAndroid="transparent"
+                                 onChangeText={(password) =>
+                                   this.setState({password})
+                                 }
+                               />
+                               {this.state.passVisible==true ? (
+                                 <Icon
+                                   size={24}
+                                   color="black"
+                                   type="font-awesome-5"
+                                   name="eye"
+                                   onPress={() =>
+                                     this.setState({passVisible: !this.state.passVisible})
+                                   }></Icon>
+                               ) : (
+                                 <Icon
+                                   size={24}
+                                   color="black"
+                                   type="font-awesome-5"
+                                   name="eye-slash"
+                                   onPress={() =>
+                                     this.setState({passVisible: !this.state.passVisible})
+                                   }></Icon>
+                               )}
+                             </View>
+
+                             <TouchableHighlight
+                               style={[
+                                 styles.buttonContainer,
+                                 styles.loginButton,
+                               ]}
+                               onPress={() => {
+                                 this.goHome();
+                               }}>
+                               <Text style={styles.loginText}>
+                                 {Names.SignIn.SignIn}
+                               </Text>
+                             </TouchableHighlight>
+                             {/* 
+                             <TouchableHighlight
+                               style={[
+                                 styles.buttonContainer,
+                                 styles.loginButton,
+                               ]}
+                               onPress={this._pressHandler}>
+                               <Text style={styles.loginText}>
+                                 {Names.SignIn.FingerPrint}
+                               </Text>
+                             </TouchableHighlight> */}
+                             <TouchableHighlight
+                               underlayColor="rgba(73,182,77,1,0.9)"
+                               style={styles.buttonContainer}
+                               onPress={() => this.goSignUp()}>
+                               <Text style={styles.noAccountText}>
+                                 {Names.SignIn.noAccount}
+                               </Text>
+                             </TouchableHighlight>
+                           </LinearGradient>
+                         </View>
+                       </ScrollView>
+                     </SafeAreaView>
+                   );
+                 }
+               }
 
 //config is optional to be passed in on Android
 const optionalConfigObject = {
@@ -275,20 +396,26 @@ const optionalConfigObject = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: screenHeight,
+    width: screenWidth,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#DCDCDC',
+    // alignItems: 'center',
+    // backgroundColor: '#DCDCDC',
   },
   inputContainer: {
-    borderBottomColor: '#F5FCFF',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 30,
+    borderBottomColor: '#dde4f0',
+    backgroundColor: '#dde4f0',
+    // borderRadius: 30,
     borderBottomWidth: 1,
     width: screenWidth * 0.8,
     height: screenHeight * 0.1,
     marginBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'center',
+  },
+  linearGradient: {
+    flex: 1,
   },
   inputs: {
     height: screenHeight * 0.2,
@@ -296,6 +423,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#FFFFFF',
     flex: 1,
     fontSize: FONT_BACK_LABEL,
+  },
+  noAccountText: {
+    color: 'white',
   },
   inputIcon: {
     width: 30,
@@ -311,9 +441,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: 250,
     borderRadius: 30,
+    alignSelf: 'center',
+  },
+  signInText: {
+    alignSelf: 'center',
+    fontWeight: 'bold',
+    fontSize: 40,
   },
   loginButton: {
-    backgroundColor: '#00b5ec',
+    backgroundColor: '#218cf4',
   },
   loginText: {
     color: 'white',
