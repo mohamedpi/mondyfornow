@@ -28,7 +28,8 @@ export default class Languages extends Component {
   async componentDidMount() {
     try {
       const id = await AsyncStorage.getItem('userId');
-      this.setState({id: id});
+      const language = await AsyncStorage.getItem('userLanguage');
+      this.setState({id,language});
       try {
         const resp = await axios.get(
           `http://192.168.1.39:8082/user/getUser/?id=${id}`,
@@ -229,6 +230,7 @@ export default class Languages extends Component {
       photoSuccess: false,
       photo: null,
       photoImported: null,
+      language:''
     };
   }
   async takePic() {

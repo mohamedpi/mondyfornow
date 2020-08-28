@@ -24,7 +24,6 @@ import axios from 'axios';
 // import FingerprintScanner from 'react-native-fingerprint-scanner';
 import TouchID from 'react-native-touch-id';
 import Names from '../fields.json';
-import NamesFr from '../fieldsFR.json';
 import LinearGradient from 'react-native-linear-gradient';
 import {Icon} from 'react-native-elements';
 
@@ -70,104 +69,64 @@ export default class LoginView extends Component {
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
 
     this.state = {
-      name: '',
-      avatar: '',
       email: '',
-      password: '',
-      userId: '',
       success: false,
       emailCorrect: true,
-      passwordCorrect: true,
       wrongMail: false,
-      wrongPass: false,
       isVerified: true,
-      passVisible: true,
-      language:"",
-      res: 200,
+      emailSent: false,
     };
   }
- 
-  _pressHandler() {
-    TouchID.isSupported()
-      .then((success) => {
-        // Success code
-        console.log('supported');
-      })
-      .catch((error) => {
-        // Failure code
-        console.log(error);
-        Alert.alert('Device does not support touch ID');
-      });
 
-    TouchID.authenticate('Scan your finger ', optionalConfigObject)
-      .then((success) => {
-        // Alert.alert('Authenticated Successfully');
-        Actions.HomeInterface();
-      })
-      .catch((error) => {
-        Alert.alert('Authentication Failed');
-      });
-  }
-
-  goSignUp() {
-    Actions.SignUp();
-  }
   validateEmail(email) {
     var pattern = '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$';
     var re = new RegExp(pattern);
     return re.test(email);
   }
 
- 
-
   async login(email, password) {
+    if (!this.validateEmail(this.state.email)) {
+      this.setState({wrongMail: true});
+      return false;
+    } else {
+      this.setState({wrongMail: false});
+    }
     try {
-      const res = await axios.post('http://192.168.1.37:8082/user/login', {
-        email: email,
-        password: password,
-      });
-      var token = res.data.token;
-      var user = res.data.user;
-      console.log(token);
-      console.log(user);
+      const res = await axios.post(
+        'http://192.168.1.37:8082/user/verifyEmail',
+        {
+          email: this.state.email,
+        },
+      );
 
       if (res.status == 200) {
-        var decoded = jwtDecode(token);
-        console.log(decoded);
-
         try {
-          const resp = await axios.get(
-            `http://192.168.1.37:8082/user/getUser/?id=${decoded._id}`,
+          const resp = await axios.post(
+            'http://192.168.1.37:8082/user/forget-password',
+            {
+              email: this.state.email,
+            },
           );
-          this.setState({
-            userName: resp.data.name,
-            userEmail: resp.data.email,
-            language:resp.data.language
-          });
-        } catch (error) {
-          console.log(error);
-        }
 
-        try {
-          await AsyncStorage.setItem('userId', decoded._id);
-          await AsyncStorage.setItem('token', token);
-          await AsyncStorage.setItem('isLogged', '1');
-          await AsyncStorage.setItem('userName', this.state.userName);
-          await AsyncStorage.setItem('userEmail', this.state.userEmail);
-          await AsyncStorage.setItem('userLanguage', this.state.language);
-        } catch (error) {
-          console.log(error);
+          if (resp.status == 200) {
+            this.setState({emailSent: true});
+            Alert.alert(
+              'An email has been sent with your password, please log in now',
+            );
+            Actions.SignIn();
+          }
+        } catch (err) {
+          console.log(err);
         }
-        Actions.HomeInterface();
       }
     } catch (err) {
       console.log(err.message);
-      if (err.response.status == 400)
+      if (err.response.status == 401)
         this.setState({
           emailCorrect: false,
-          passwordCorrect: false,
         });
-      if (err.response.status == 401) this.setState({isVerified: false});
+      else if (err.response.status == 402) this.setState({isVerified: false});
+      else console.log(err);
     }
   }
 
@@ -181,14 +140,12 @@ export default class LoginView extends Component {
     this.login(this.state.email, this.state.password);
   }
 
-  async forgotPassword() {
-    Actions.ForgotPassword();
-  }
+  async forgotPassword() {}
 
   render() {
-    const error = 'Email or Password is wrong';
     const errorMail = 'Please write a correct mail address';
     const verifyMail = 'Please verify your mail address first ';
+    const mailNotFound = 'We were unable to find a user with that email';
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView>
@@ -198,17 +155,20 @@ export default class LoginView extends Component {
               style={styles.linearGradient}>
               <View style={{height: screenHeight * 0.08}}></View>
               <View>
-                <Text style={styles.signInText}>{Names.SignIn.SignIn}</Text>
+                <Text style={styles.signInText}>
+                  Please enter your email address
+                </Text>
               </View>
               <View style={{height: screenHeight * 0.05}}></View>
-              <Text style={{color: 'red'}}>
-                {!this.state.emailCorrect ? error : null}
-              </Text>
+
               <Text style={{color: 'red'}}>
                 {this.state.wrongMail ? errorMail : null}
               </Text>
               <Text style={{color: 'red'}}>
                 {!this.state.isVerified ? verifyMail : null}
+              </Text>
+              <Text style={{color: 'red'}}>
+                {!this.state.emailCorrect ? mailNotFound : null}
               </Text>
               <View style={styles.inputContainer}>
                 <AntDesign
@@ -234,57 +194,13 @@ export default class LoginView extends Component {
                 />
                 {this.state.typing_email ? this._typing() : null}
               </View>
-              {/* <Text>{!this.state.passwordCorrect ? error : ''}</Text> */}
-              <View style={styles.inputContainer}>
-                <AntDesign
-                  style={styles.icon}
-                  name="key"
-                  size={screenWidth * 0.08}
-                />
-                <TextInput
-                  ref={(password) => (this.password = password)}
-                  style={styles.inputs}
-                  placeholder={Names.SignIn.Password}
-                  secureTextEntry={this.state.passVisible}
-                  underlineColorAndroid="transparent"
-                  onChangeText={(password) => this.setState({password})}
-                />
-                {this.state.passVisible == true ? (
-                  <Icon
-                    size={24}
-                    color="black"
-                    type="font-awesome-5"
-                    name="eye"
-                    onPress={() =>
-                      this.setState({
-                        passVisible: !this.state.passVisible,
-                      })
-                    }></Icon>
-                ) : (
-                  <Icon
-                    size={24}
-                    color="black"
-                    type="font-awesome-5"
-                    name="eye-slash"
-                    onPress={() =>
-                      this.setState({
-                        passVisible: !this.state.passVisible,
-                      })
-                    }></Icon>
-                )}
-              </View>
-              <TouchableHighlight
-                underlayColor="rgba(73,182,77,1,0.9)"
-                style={styles.buttonContainer}
-                onPress={() => this.forgotPassword()}>
-                <Text style={styles.noAccountText}>Forgot password?</Text>
-              </TouchableHighlight>
+
               <TouchableHighlight
                 style={[styles.buttonContainer, styles.loginButton]}
                 onPress={() => {
                   this.goHome();
                 }}>
-                <Text style={styles.loginText}>{Names.SignIn.SignIn}</Text>
+                <Text style={styles.loginText}>Send</Text>
               </TouchableHighlight>
               {/* 
                              <TouchableHighlight
@@ -373,7 +289,7 @@ const styles = StyleSheet.create({
   signInText: {
     alignSelf: 'center',
     fontWeight: 'bold',
-    fontSize: 40,
+    fontSize: 20,
   },
   loginButton: {
     backgroundColor: '#218cf4',

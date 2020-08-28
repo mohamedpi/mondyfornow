@@ -17,6 +17,8 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Actions} from 'react-native-router-flux';
 import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
+// import Names from 'C:Usersguira\react nativemondyfornow\fields.json';
+// import NamesFr from '../fieldsFR.json';
 
 class SettingsScreen extends Component {
   // static propTypes = {
@@ -40,13 +42,14 @@ class SettingsScreen extends Component {
       this.setState({id: id});
       try {
         const resp = await axios.get(
-          `http://192.168.1.39:8082/user/getUser/?id=${id}`,
+          `http://192.168.1.37:8082/user/getUser/?id=${id}`,
         );
         console.log(resp.data);
         this.setState({
           userName: resp.data.name,
           userEmail: resp.data.email,
           photo: resp.data.userImage,
+          language: resp.data.language,
         });
       } catch (error) {
         console.log(error);
@@ -65,6 +68,7 @@ class SettingsScreen extends Component {
       userEmail: '',
       photo: null,
       photoImported: null,
+      language:''
     };
   }
 
@@ -103,8 +107,12 @@ class SettingsScreen extends Component {
     Actions.AboutUs();
   }
 
-  goToPassword(){
+  goToPassword() {
     Actions.changePass();
+  }
+  
+  goToFeedback(){
+    Actions.feedback();
   }
 
   render() {
@@ -132,7 +140,7 @@ class SettingsScreen extends Component {
                 rounded
                 size="large"
                 source={{
-                  uri: 'http://192.168.1.39:8082/' + this.state.photo,
+                  uri: 'http://192.168.1.37:8082/' + this.state.photo,
                 }}></Avatar>
             )}
             {/* <Accessory /> */}
@@ -147,7 +155,7 @@ class SettingsScreen extends Component {
               {email}
             </Text>
           </View>
-          <View style={{height: 10, alignContent:"space-between"}}></View>
+          <View style={{height: 10, alignContent: 'space-between'}}></View>
           <TouchableOpacity onPress={() => this.logOut()}>
             <View style={styles.logOutView}>
               <Text style={styles.logOutText}>Log out</Text>
@@ -265,7 +273,7 @@ class SettingsScreen extends Component {
           />
           <ListItem
             title="Language"
-            rightTitle="English"
+            rightTitle={this.state.language=="en" ?"English":"French"}
             rightTitleStyle={{fontSize: 15}}
             onPress={() => this.goToLanguages()}
             containerStyle={styles.listItemContainer}
@@ -316,7 +324,7 @@ class SettingsScreen extends Component {
 
           <ListItem
             title="Send FeedBack"
-            // onPress={() => this.onPressOptions()}
+            onPress={() => this.goToFeedback()}
             containerStyle={styles.listItemContainer}
             leftIcon={
               <BaseIcon
@@ -341,7 +349,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   userRow: {
-    alignContent:"space-between",
+    alignContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
     paddingBottom: 8,
