@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
+  AsyncStorage
 } from 'react-native';
 import {ListItem} from 'react-native-elements';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -16,28 +17,36 @@ export default class LikedInterface extends Component {
                  constructor() {
                    super();
                    this.state = {
-                     list: [],
+                     list: [1,2],
+                     id :"",
                      refreshing: false,
                    };
                  }
                  async componentDidMount() {
-                   const resp = await axios.get(
-                     'http://192.168.43.124:8082/games/showFavorites',
-                   );
+                   try{
 
-                   this.setState({list: resp.data});
+                        var id  = await AsyncStorage.getItem("userId")
+                       this.setState({id:id})
+
+                      }
+                   catch (err) {
+                     console.log(err.message);
+                        }
+
+
+
                  }
 
                  _onRefresh = () =>  {
                    this.setState({refreshing: true});
                    axios
-                     .get('http://192.168.43.124:8082/games/showFavorites')
+                     .get(`http://192.168.43.173:5000/user/getUser/?id=${this.state.id}`)
                      .then((resp) => {
-                       this.setState({refreshing: false, list: resp.data});
+                       this.setState({refreshing: false, list: resp.data.liked});
                      });
                  };
 
-                async unfavorite(id){
+                async unfavorite(id,item){
                   console.log(id);
                  try {
                   // resp = await axios.delete(
@@ -45,10 +54,7 @@ export default class LikedInterface extends Component {
                   //   {_id: id},
                   // );
                   //  console.log(resp.data)
-                      axios
-                        .delete(
-                          `http://192.168.43.124:8082/games/removeFavorite/?id=${id}`,
-                        )
+                    axios.put(`http://192.168.43.173:5000/games/removeFavorite/${id}`,item)
                         .then((res) => {
                           console.log(res);
                           console.log(res.data);
@@ -73,20 +79,20 @@ export default class LikedInterface extends Component {
                              <Text style={styles.textStyle}>Your WishList</Text>
                            </View>
 
-                           {(this.state.list.length !==0) ? (
+                           {(this.state.list) ? (
                              this.state.list.map((l, i) => (
                                <ListItem
                                  key={i}
                                  leftAvatar={{
                                    source: {
                                      uri:
-                                       'http://192.168.43.124:8082/' +
-                                       l.gameImage,
+
+                                       l.imageURI,
                                    },
                                    rounded: false,
                                  }}
-                                 title={l.name}
-                                 subtitle={l.details}
+                                 title={l.title}
+                                 subtitle={l.description}
                                  bottomDivider
                                  rightIcon={
                                    <AntDesign
@@ -95,7 +101,7 @@ export default class LikedInterface extends Component {
                                      size={20}
                                      onPress={() => {
                                        console.log('hi');
-                                       this.unfavorite(l._id);
+                                       this.unfavorite(l._id,l);
                                      }}
                                    />
                                  }

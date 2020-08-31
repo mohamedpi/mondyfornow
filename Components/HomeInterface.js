@@ -1,25 +1,39 @@
-import React,{useEffect} from "react"
-import {View,Text,Image,SafeAreaView,StyleSheet,ScrollView,TouchableOpacity} from "react-native"
+import React,{useEffect,useState} from "react"
+import {View,Text,Image,SafeAreaView,StyleSheet,ScrollView,TouchableOpacity,AsyncStorage} from "react-native"
 import { Button, ThemeProvider,Card,ListItem} from 'react-native-elements';
 import { createStackNavigator } from '@react-navigation/stack';
 import {connect} from "react-redux"
 import {getGames} from "../actions/actions"
+import {setVisibility} from "../actions/actions"
 import Axios from "axios"
 import Swiper from "react-native-swiper"
 import StarRating from "./StarRating"
+import Modal from 'react-native-modal';
 
 
 function HomeInterface(props){
+  const [user,setUser] = useState("")
+
+
+
   useEffect(()=>{
     async function getData()
    {
-    const response = await Axios.get("http://192.168.43.173:5000/games");
+    const response = await Axios.get("http://192.168.43.173:5000/games/show");
     props.getGames(response.data)
-   }
-   getData()
- })
+
+  }
+    getData()
+ },props.games)
+
  return(
    <>
+   <Modal isVisible={props.visible}>
+          <View style={{flex: 1}}>
+            <Text>Hello!</Text>
+            <Button title="Hide modal" onPress={props.setVisibility(false)} />
+          </View>
+    </Modal>
       <ScrollView style={styles.container}>
          <View style ={styles.sliderContainer}>
           <Swiper autoplay horizontal={false} height={200} activeDotColor="#181b20">
@@ -36,7 +50,7 @@ function HomeInterface(props){
           </Swiper>
           </View>
           <View>
-                  <Text style={styles.textStyle}>Our partners </Text>
+                  <Text style={styles.textStyle}>Our Offers </Text>
           </View>
           <View style ={styles.categroyContainer}>
                <Image source ={require("../assets/axiata.jpg")} style={styles.categoryIcon}/>
@@ -178,7 +192,8 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state =>({
-  games : state.games
+  games : state.games,
+  visible:state.visible
 })
 
-export default connect(mapStateToProps,{getGames})(HomeInterface)
+export default connect(mapStateToProps,{getGames,setVisibility})(HomeInterface)

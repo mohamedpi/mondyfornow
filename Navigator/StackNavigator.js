@@ -1,16 +1,40 @@
-import React from "react"
-import {View,Text,StyleSheet,TouchableOpacity} from "react-native"
+import React,{useEffect,useState} from "react"
+import {View,Text,StyleSheet,TouchableOpacity,AsyncStorage} from "react-native"
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeInterface from "../Components/HomeInterface"
 import OffersListInterface from "../Components/OffersListInterface"
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { Avatar, Accessory } from 'react-native-elements';
+import { Avatar, Accessory,Badge } from 'react-native-elements';
 import OfferItem from "../Components/OfferItem"
-
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import axios from "axios"
+import Modal from 'react-native-modal';
+import {setVisibility} from "../actions/actions"
+import {connect} from "react-redux"
 
 const Stack = createStackNavigator();
 
-export default function MyHomeStack() {
+function MyHomeStack(props) {
+  const [user,setUser] = useState("")
+  const [modalvisibility,setModalVisibility] = useState(false)
+  const[panier,setPanier] = useState(0)
+
+  const toggleModal = () => {
+   setModalVisibility(!modalvisibility)
+ };
+
+  useEffect(()=>{
+    async function fetchUser()
+    {
+      const id = await AsyncStorage.getItem('userId');
+      const resp = await axios(`http://192.168.43.173:5000/user/getUser/${id}`)
+      setUser(resp.data)
+      setPanier(resp.data.panier.length)
+    }
+
+    fetchUser()
+
+  })
   return (
     <Stack.Navigator    screenOptions={{
 
@@ -19,14 +43,19 @@ export default function MyHomeStack() {
       >
       <Stack.Screen name="Home" component={HomeInterface} options={{headerTitleStyle:styles.labelStyle,
         headerRight : () => {return(
-          < View style={{flexDirection:"row",marginRight:10,justifyContent:"space-around"}}>
-          <MaterialCommunityIcons name="text-search" color={"white"} size={25}   />
-        <Avatar
-        size ={30}
-        containerStyle={{marginLeft: 20}}
-        rounded
-        source={{  uri:  'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg'}}/>
-  </View> )}  }} />
+          < TouchableOpacity style={styles.shoppingCart} onPress={()=>props.setVisibility(true)}>
+
+ <AntDesign
+   name="shoppingcart"
+   size={30}
+   color={"white"} />
+   <Badge
+   status="primary"
+   containerStyle={{ position: 'absolute', top: -4, right: -4 }}
+   value={panier}
+ />
+
+  </TouchableOpacity> )}  }} />
       <Stack.Screen name="Offers" component={OffersListInterface} options={{headerTitleStyle:styles.labelStyle,headerTintColor:"white"} } />
         <Stack.Screen name="OfferItem" component={OfferItem} options={{headerTitleStyle:styles.labelStyle,headerTintColor:"white"} } />
     </Stack.Navigator>
@@ -37,5 +66,9 @@ const styles = StyleSheet.create({
     fontFamily:"GlueGun-GW8Z",
     fontSize:30,
     color:"white"
+  },
+  shoppingCart:{
+    marginRight:10
   }
 })
+export default connect(null,{setVisibility})(MyHomeStack)

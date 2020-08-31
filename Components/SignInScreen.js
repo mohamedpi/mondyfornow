@@ -67,6 +67,7 @@ export default class LoginView extends Component {
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
 
     this.state = {
+      userName:"",
       name: '',
       avatar: '',
       email: '',
@@ -79,6 +80,9 @@ export default class LoginView extends Component {
       wrongPass: false,
       isVerified: true,
       res: 200,
+      liked:[]
+
+
 
       // typing_email: false,
       // typing_password: false,
@@ -138,9 +142,64 @@ export default class LoginView extends Component {
     var re = new RegExp(pattern);
     return re.test(email);
   }
+  async login(email, password){
+    try {
+      const res = await axios.post('http://192.168.43.173:5000/user/login', {
+        email: email,
+        password: password,
+      });
+      var token = res.data.token;
+      var user = res.data.user;
+      console.log(token)
+      console.log(user)
 
-  async goHome() {
-    console.warn(this.state.email + this.state.password);
+      if (res.status == 200) {
+        var decoded = jwtDecode(token);
+        console.log(decoded);
+        this.setState({touchIdEnabled: user.touchIdEnabled && !user.firstTime});
+      //  Keychain.setGenericPassword(email, password); // store the credentials in the keychain
+
+        try {
+          const resp = await axios.get(
+            `http://192.168.43.173:5000/user/getUser/?id=${decoded._id}`,
+          );
+          this.setState({userName: resp.data.name, userEmail: resp.data.email,userId:resp.data._id,liked:resp.data.liked});
+        } catch (error) {
+          console.log(error);
+        }
+
+        try {
+          await AsyncStorage.setItem('userId', this.state.userId);
+          await AsyncStorage.setItem('liked', this.state.liked);
+          await AsyncStorage.setItem('token', token);
+          console.log(this.state.userEmail);
+          await AsyncStorage.setItem('userName', this.state.userName);
+          await AsyncStorage.setItem('userEmail', this.state.userEmail);
+        } catch (error) {
+          console.log(error);
+        }
+        Actions.HomeInterface();
+      }
+    } catch (err) {
+      console.log(err.message);
+      if (err.response.status == 400)
+        this.setState({emailCorrect: false, passwordCorrect: false});
+      if (err.response.status == 401) this.setState({isVerified: false});
+    }
+  }
+
+
+    async goHome() {
+      if (!this.validateEmail(this.state.email)) {
+        this.setState({wrongMail: true});
+        return false;
+      } else {
+        this.setState({wrongMail: false});
+      }
+    this.login(this.state.email,this.state.password);
+    }
+/*  async goHome() {
+   console.warn(this.state.email + this.state.password);
     if (!this.validateEmail(this.state.email)) {
       this.setState({wrongMail: true});
       return false;
@@ -175,12 +234,13 @@ export default class LoginView extends Component {
         this.setState({isVerified: false});
 
     }
-  }
+  }*/
 
   render() {
     const error = 'Email or Password is wrong';
     const errorMail = 'Please write a correct mail address';
     const verifyMail = 'Please verify your mail address first ';
+
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView>

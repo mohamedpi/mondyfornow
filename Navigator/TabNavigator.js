@@ -13,6 +13,7 @@ import SearchInterface from "../Components/SearchInterface"
 import OfferItem from "../Components/OfferItem"
 import LoginScreen from "../Components/SignInScreen"
 import MyHomeStack from "./StackNavigator"
+import MySearchStack from "./SearchNavigator"
 import ProfileRouter from "./profileRouter"
 
 const Tab =  createMaterialTopTabNavigator();
@@ -54,7 +55,7 @@ function TabNavigator()
           ),
         }}/>
 
-         <Tab.Screen name="Search" component={SearchInterface}
+         <Tab.Screen name="Search" component={MySearchStack}
          options={{
           tabBarLabel: 'Search',
           tabBarIcon: ({ color, size }) => (
