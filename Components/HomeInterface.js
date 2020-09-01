@@ -10,7 +10,7 @@ import Swiper from "react-native-swiper"
 import StarRating from "./StarRating"
 import Modal from 'react-native-modal';
 import OfferItem from "./OfferItem"
-
+//chebbitwo
 
 function HomeInterface(props){
   const [user,setUser] = useState([{title:"fuck ou"}])
