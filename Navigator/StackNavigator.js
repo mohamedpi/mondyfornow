@@ -34,7 +34,7 @@ function MyHomeStack(props) {
 
     fetchUser()
 
-  })
+  },user.panier)
   return (
     <Stack.Navigator    screenOptions={{
 
