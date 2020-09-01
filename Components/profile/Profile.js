@@ -42,7 +42,7 @@ class SettingsScreen extends Component {
       this.setState({id: id});
       try {
         const resp = await axios.get(
-          `http://192.168.1.37:8082/user/getUser/?id=${id}`,
+          `http://192.168.1.40:8082/user/getUser/?id=${id}`,
         );
         console.log(resp.data);
         this.setState({
@@ -68,7 +68,7 @@ class SettingsScreen extends Component {
       userEmail: '',
       photo: null,
       photoImported: null,
-      language:''
+      language:'',
     };
   }
 
@@ -76,10 +76,16 @@ class SettingsScreen extends Component {
     this.props.navigation.navigate('options');
   };
 
-  onChangePushNotifications = () => {
-    this.setState((state) => ({
+  onChangePushNotifications= async() => {
+    this.setState((state)=>({
       pushNotifications: !state.pushNotifications,
     }));
+      try {
+          await AsyncStorage.removeItem('pushNotif');
+          await AsyncStorage.setItem('pushNotif', this.state.pushNotifications.toString());
+        } catch (error) {
+          console.log(error); 
+        }
   };
 
   onChangeDarkMode = () => {
@@ -95,8 +101,14 @@ class SettingsScreen extends Component {
     Actions.Edit();
   }
 
-  logOut() {
-    Actions.Splash({type: 'reset'});
+ async logOut() {
+    try {
+          await AsyncStorage.removeItem('isLogged');
+          Actions.Splash();
+        } catch (error) {
+          console.log(error);
+        }
+    
   }
 
   gotToCreditCard() {
@@ -140,7 +152,7 @@ class SettingsScreen extends Component {
                 rounded
                 size="large"
                 source={{
-                  uri: 'http://192.168.1.37:8082/' + this.state.photo,
+                  uri: 'http://192.168.1.40:8082/' + this.state.photo,
                 }}></Avatar>
             )}
             {/* <Accessory /> */}
@@ -202,13 +214,6 @@ class SettingsScreen extends Component {
               <Switch
                 trackColor={{true: 'red', false: 'black'}}
                 thumbColor="#FFFFFF"
-                // thumbColor={[
-                //   Platform.OS == 'ios'
-                //     ? '#FFFFFF'
-                //     : this.state.darkMode
-                //     ? '#7ab8e1'
-                //     : '#ffffff',
-                // ]}
                 onValueChange={this.onChangeDarkMode}
                 value={this.state.darkMode}
               />
@@ -273,7 +278,7 @@ class SettingsScreen extends Component {
           />
           <ListItem
             title="Language"
-            rightTitle={this.state.language=="en" ?"English":"French"}
+            rightTitle={this.state.language == 'en' ? 'English' : 'French'}
             rightTitleStyle={{fontSize: 15}}
             onPress={() => this.goToLanguages()}
             containerStyle={styles.listItemContainer}

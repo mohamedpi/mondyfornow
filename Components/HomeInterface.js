@@ -1,25 +1,53 @@
-import React,{useEffect} from "react"
-import {View,Text,Image,SafeAreaView,StyleSheet,ScrollView,TouchableOpacity} from "react-native"
+import React,{useEffect,useState} from "react"
+import {View,Text,Image,SafeAreaView,StyleSheet,ScrollView,TouchableOpacity,AsyncStorage} from "react-native"
 import { Button, ThemeProvider,Card,ListItem} from 'react-native-elements';
 import { createStackNavigator } from '@react-navigation/stack';
 import {connect} from "react-redux"
 import {getGames} from "../actions/actions"
+import {setVisibility} from "../actions/actions"
 import Axios from "axios"
 import Swiper from "react-native-swiper"
 import StarRating from "./StarRating"
-
+import Modal from 'react-native-modal';
+import OfferItem from "./OfferItem"
+//chebbitwo
 
 function HomeInterface(props){
+  const [user,setUser] = useState([{title:"fuck ou"}])
+
+
+
   useEffect(()=>{
     async function getData()
    {
-    const response = await Axios.get('http://192.168.1.39:8082/games');
+    const response = await Axios.get("http://192.168.1.40:8082/games/show");
     props.getGames(response.data)
-   }
-   getData()
- })
+  }
+  async function fetchUser()
+  {
+    const id = await AsyncStorage.getItem('userId');
+    const resp = await axios(`http://192.168.1.40:8082/user/getUser/?id=${id}`)
+    setUser(resp.data.panier)
+
+  }
+    fetchUser()
+    getData()
+
+ },props.games,user)
+
  return(
    <>
+   <Modal isVisible={props.visible} coverScreen={true}>
+          <View style={{flex: 1,backgroundColor:"white"}}>
+            {user.map(item=>(
+                <View>
+                   <Text>{item.title}hey m</Text>
+                </View>
+              ))}
+            <Button title="Hide modal" onPress={()=>props.setVisibility(false)} />
+
+          </View>
+    </Modal>
       <ScrollView style={styles.container}>
          <View style ={styles.sliderContainer}>
           <Swiper autoplay horizontal={false} height={200} activeDotColor="#181b20">
@@ -36,37 +64,67 @@ function HomeInterface(props){
           </Swiper>
           </View>
           <View>
-                  <Text style={styles.textStyle}>Our partners </Text>
-          </View>
-          <View style ={styles.categroyContainer}>
-               <Image source ={require("../assets/axiata.jpg")} style={styles.categoryIcon}/>
-               <Image source ={require("../assets/Orange.jpg")} style={styles.categoryIcon}/>
-               <Image source ={require("../assets/Turkcell.jpg")} style={styles.categoryIcon}/>
-          </View >
-          <View style ={styles.categroyContainer}>
-               <Image source ={require("../assets/amazon.png")} style={styles.categoryIcon}/>
-               <Image source ={require("../assets/dimond2.png")} style={styles.categoryIcon}/>
-               <Image source ={require("../assets/dimond3.png")} style={styles.categoryIcon}/>
-          </View >
-          <View>
-                  <Text style={styles.textStyle}>New Offers </Text>
-          </View>
-          <TouchableOpacity >
-     <View style={styles.card}>
-       <View style={styles.cardImgWrapper}>
-         <Image
-           source={require("../assets/logo.jpg")}
-           resizeMode="cover"
-           style={styles.cardImg}
-         />
-       </View>
-       <View style={styles.cardInfo}>
-         <Text style={styles.cardTitle}>title</Text>
-         <StarRating ratings={5} reviews={"itemData.reviews"} />
-         <Text numberOfLines={2} style={styles.cardDetails}>description</Text>
-       </View>
-     </View>
-   </TouchableOpacity>
+           <Text style={styles.textStyle}>check our new offers</Text>
+        </View>
+        <View>
+           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} scrollEventThrottle={16}>
+             <Card
+                containerStyle={styles.cardStyle}
+                imageStyle={styles.imageStyle}
+                image={require('../assets/dimond1.png')}>
+              </Card>
+              <Card
+                 containerStyle={styles.cardStyle}
+                 imageStyle={styles.imageStyle}
+                 image={require('../assets/dimond2.png')}>
+               </Card>
+               <Card
+                  containerStyle={styles.cardStyle}
+                  imageStyle={styles.imageStyle}
+                  image={require('../assets/dimond3.png')}>
+                </Card>
+                <Card
+                   containerStyle={styles.cardStyle}
+                   imageStyle={styles.imageStyle}
+                   image={require('../assets/dimond4.jpg')}>
+                 </Card>
+           </ScrollView>
+           </View>
+           <View>
+                <Text style={styles.textStyle}>Discounts </Text>
+             </View>
+
+             <ListItem containerStyle ={styles.listItemContainer}
+               key={1}
+               leftAvatar={{
+              source: require('../assets/dimond4.jpg'),
+              }}
+              title=<Text style={styles.listItemTitle}>Welcome</Text>
+              subtitle=<Text style={styles.listItemDes}>offer generated at first signUp</Text>
+              rightSubtitle=<Text style={styles.price}>45$</Text>
+              bottomDivider
+             />
+             <ListItem containerStyle ={styles.listItemContainer}
+               key={2}
+               leftAvatar={{
+              source: require('../assets/dimond3.png'),
+              }}
+              title=<Text style={styles.listItemTitle}>Lucky day</Text>
+              subtitle=<Text style={styles.listItemDes}>offer generated on your birthday</Text>
+              rightSubtitle=<Text style={styles.price}>40$</Text>
+              bottomDivider
+             />
+             <ListItem containerStyle ={styles.listItemContainer}
+               key={3}
+               leftAvatar={{
+              source: require('../assets/dimond2.png'),
+              }}
+              title=<Text style={styles.listItemTitle}>happy year</Text>
+              subtitle=<Text style={styles.listItemDes}>offer generated idk when</Text>
+              rightSubtitle=<Text style={styles.price}>25$</Text>
+              bottomDivider
+             />
+
       </ScrollView>
    </>
  )
@@ -75,7 +133,7 @@ function HomeInterface(props){
 const styles = StyleSheet.create({
  container:{
    flex:1,
-   backgroundColor:"white"
+   backgroundColor:"#121419"
 
  },
   textStyle:{
@@ -84,8 +142,14 @@ const styles = StyleSheet.create({
      fontFamily:"GlueGun-GW8Z",
      fontSize:25,
      color:"gray",
-     textAlign:"center"
+     textAlign:"left"
    },
+   cardStyle:{
+   width:135,
+   height:135,
+   borderRadius:20
+
+ },
    sliderContainer:{
      height:200,
       width:"90%",
@@ -174,11 +238,29 @@ const styles = StyleSheet.create({
   cardDetails: {
     fontSize: 12,
     color: '#444',
+  },
+  listItemTitle:{
+    fontFamily:"GlueGun-GW8Z",
+    fontSize:15,
+    color:"#dce0e9"
+  },
+  listItemDes:{
+    fontSize:12,
+    color:"#dce0e9"
+  },
+  listItemContainer:{
+    backgroundColor:"#121419"
+  },
+  price:{
+      fontFamily:"GlueGun-GW8Z",
+       fontSize:20,
+       color:"#dce0e9"
   }
 })
 
 const mapStateToProps = state =>({
-  games : state.games
+  games : state.games,
+  visible:state.visible
 })
 
-export default connect(mapStateToProps,{getGames})(HomeInterface)
+export default connect(mapStateToProps,{getGames,setVisibility})(HomeInterface)

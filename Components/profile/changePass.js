@@ -52,7 +52,7 @@ export default class Languages extends Component {
         try {
           const res = await axios({
             method: 'post',
-            url: 'http://192.168.1.39:8082/profile/verifyPassword',
+            url: 'http://192.168.1.40:8082/profile/verifyPassword',
             data: {id: id, password: this.state.oldpassword},
             headers: {
               'auth-token': token,
@@ -74,7 +74,7 @@ export default class Languages extends Component {
           try {
             const res = await axios({
               method: 'put',
-              url: 'http://192.168.1.39:8082/profile/updatePassword',
+              url: 'http://192.168.1.40:8082/profile/updatePassword',
               data: {_id: id, password: this.state.newPassword},
               headers: {
                 'auth-token': token,

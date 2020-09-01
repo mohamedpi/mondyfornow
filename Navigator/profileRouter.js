@@ -9,6 +9,8 @@ import creditCard from '../Components/profile/creditCard'
 import aboutUs from '../Components/profile/aboutUs'
 import changePass from '../Components/profile/changePass'
 import sendFeedback from '../Components/profile/sendFeedback'
+import SignIn from '../Components/SignInScreen'
+
 
 export default class Route extends Component {
 
@@ -46,6 +48,13 @@ export default class Route extends Component {
             key="feedback"
             component={sendFeedback}
             title="Send feedback"
+          />
+          <Scene
+                      hideNavBar={true}
+            key="SignIn"
+            component={SignIn}
+            title="Sign In"
+            
           />
         </Scene>
       </Router>

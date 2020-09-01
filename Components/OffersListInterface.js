@@ -14,7 +14,7 @@ function OffersListInterface(props){
   useEffect(()=>{
     async function getOffreById()
     {
-    const response = await Axios.get( `http://192.168.43.173:5000/offersById/${game._id}`)
+    const response = await Axios.get( `http://192.168.1.40:8082/offer/offersById/${game._id}`)
     setOffres(response.data)
     }
     getOffreById()

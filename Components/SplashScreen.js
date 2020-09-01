@@ -73,7 +73,7 @@ export default class SplashScreen extends Component {
       //     loadingSpinner: true,
       // });
     setTimeout(() => {
-      if (isLogged == 1) Actions.Home();
+      if (isLogged == 1) Actions.SignIn();
       else Actions.SignIn();
     }, 1500);
     });

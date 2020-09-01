@@ -16,7 +16,7 @@ function SearchInterface(props){
   useEffect(()=>{
     async function getData()
    {
-    const response = await Axios.get("http://192.168.43.173:5000/games");
+    const response = await Axios.get("http://192.168.1.40:8082/games/show");
     setData(response.data)
    }
    getData()
@@ -44,7 +44,7 @@ const handleTextChange = (text) =>{
           />
           </View>
           <View>
-             {dataList.map(item  => <SearchItem key ={item._id} game ={item}/>) }
+             {dataList.map(item  => <SearchItem key ={item._id} game ={item} navigation={props.navigation.navigate}/>) }
           </View>
 
        </ScrollView>

@@ -48,7 +48,7 @@ async componentDidMount(){
                          try {
      const resp = await axios({
             method: 'put',
-            url: 'http://192.168.1.37:8082/profile/updateLanguage',
+            url: 'http://192.168.1.40:8082/profile/updateLanguage',
             data: {id: this.state.id, language: this.state.language},
             headers: {
               'auth-token': this.state.token,

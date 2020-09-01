@@ -95,7 +95,7 @@ export default class SignUpScreen extends Component {
                  if(this.state.wrongMail==false&&this.state.confirmPassword==true)
                        {  try {
                      const resp = await axios.post(
-                       'http://192.168.1.37:8082/user/register',
+                       'http://192.168.1.40:8082/user/register',
                        {
                          email: this.state.email,
                          password: this.state.password,

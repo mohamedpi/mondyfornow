@@ -9,6 +9,7 @@ import {
   TouchableHighlight,
   ScrollView,
   AsyncStorage,
+  Alert,
 } from 'react-native';
 import {Avatar, ListItem, Icon, Accessory} from 'react-native-elements';
 import {Container, Content, Form, Text, View, H3} from 'native-base';
@@ -16,6 +17,7 @@ import {Actions} from 'react-native-router-flux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
+import PushNotification from 'react-native-push-notification';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -24,15 +26,45 @@ export default class Languages extends Component {
   goToProfile() {
     Actions.profile();
   }
+//naamel variable fel async storage est ce que activé l push notifs wale
+  async getGamesNumber() {
+    try {
+      const nb = await AsyncStorage.getItem('nbGames');
+
+      const resp = await axios.get('http://192.168.1.40:8082/games/countGames');
+      // console.log("resp data "+resp.data);
+      console.log('nb games state ' + nb);
+      if (parseInt(resp.data.games, 10) > parseInt(nb, 10)) {
+        try {
+          await AsyncStorage.removeItem('nbGames');
+          await AsyncStorage.setItem('nbGames', resp.data.games.toString());
+          const pushNotif = await AsyncStorage.getItem('pushNotif');
+          if(pushNotif=="true")
+            PushNotification.localNotification({
+              title: 'New game', // (optional)
+              message: 'There is a new game in store, make sure to check it', // (required)
+            });
+
+          // setState({nbGames});
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   async componentDidMount() {
     try {
       const id = await AsyncStorage.getItem('userId');
       const language = await AsyncStorage.getItem('userLanguage');
-      this.setState({id,language});
+      this.setState({id, language});
+      setInterval(this.getGamesNumber, 10000);
+
       try {
         const resp = await axios.get(
-          `http://192.168.1.39:8082/user/getUser/?id=${id}`,
+          `http://192.168.1.40:8082/user/getUser/?id=${id}`,
         );
         console.log(resp.data);
         this.setState({
@@ -46,6 +78,13 @@ export default class Languages extends Component {
     }
   }
 
+  sendNotification() {
+    PushNotification.localNotification({
+      title: 'My Notification Title', // (optional)
+      message: 'My Notification Message', // (required)
+    });
+  }
+
   async submit() {
     try {
       var id = await AsyncStorage.getItem('userId');
@@ -56,7 +95,7 @@ export default class Languages extends Component {
         try {
           const res = await axios({
             method: 'post',
-            url: 'http://192.168.1.39:8082/profile/verifyPassword',
+            url: 'http://192.168.1.40:8082/profile/verifyPassword',
             data: {id: id, password: this.state.password},
             headers: {
               'auth-token': token,
@@ -76,7 +115,7 @@ export default class Languages extends Component {
               //name
               const res = await axios({
                 method: 'put',
-                url: 'http://192.168.1.39:8082/profile/updateName',
+                url: 'http://192.168.1.40:8082/profile/updateName',
                 data: {_id: id, name: this.state.name},
                 headers: {
                   'auth-token': token,
@@ -101,7 +140,7 @@ export default class Languages extends Component {
             try {
               const res = await axios({
                 method: 'put',
-                url: 'http://192.168.1.39:8082/profile/updateAvatar',
+                url: 'http://192.168.1.40:8082/profile/updateAvatar',
                 data: {_id: id, avatar: this.state.avatar},
                 headers: {
                   'auth-token': token,
@@ -128,7 +167,7 @@ export default class Languages extends Component {
             try {
               const res = await axios({
                 method: 'put',
-                url: 'http://192.168.1.39:8082/profile/updateEmail',
+                url: 'http://192.168.1.40:8082/profile/updateEmail',
                 data: {_id: id, email: this.state.email},
                 headers: {
                   'auth-token': token,
@@ -153,41 +192,44 @@ export default class Languages extends Component {
           //password
 
           //profile pic
-       if(this.state.photoImported) {  console.log('photoImported' + this.state.photoImported);
-          if (this.state.photoImported != null) {
-            let uri = this.state.photoImported.uri;
-            let formData = new FormData();
-            let filename = uri.split('/').pop();
-            console.log(filename);
-            formData.append('userImage', {
-              uri: this.state.photoImported.uri,
-              type: this.state.photoImported.type,
-              name: this.state.photoImported.fileName,
-            });
-            formData.append('id', id);
-            console.log('formdata' + formData);
-            try {
-              const res = await axios({
-                method: 'put',
-                url: 'http://192.168.1.39:8082/profile/updatePhoto',
-                data: formData,
-                headers: {
-                  Accept: 'application/json',
-                  'content-type': 'multipart/form-data',
-                },
+          if (this.state.photoImported) {
+            console.log('photoImported' + this.state.photoImported);
+            if (this.state.photoImported != null) {
+              let uri = this.state.photoImported.uri;
+              let formData = new FormData();
+              let filename = uri.split('/').pop();
+              console.log(filename);
+              formData.append('userImage', {
+                uri: this.state.photoImported.uri,
+                type: this.state.photoImported.type,
+                name: this.state.photoImported.fileName,
               });
-              if (res.status == 200) {
-                console.log('success photo');
-                this.setState({photoSuccess: true});
+              formData.append('id', id);
+              console.log('formdata' + formData);
+              try {
+                const res = await axios({
+                  method: 'put',
+                  url: 'http://192.168.1.40:8082/profile/updatePhoto',
+                  data: formData,
+                  headers: {
+                    Accept: 'application/json',
+                    'content-type': 'multipart/form-data',
+                  },
+                });
+                if (res.status == 200) {
+                  console.log('success photo');
+                  this.setState({photoSuccess: true});
+                }
+              } catch (error) {
+                console.log(error);
               }
-            } catch (error) {
-              console.log(error);
             }
-          }}
-          else{this.setState({photoSuccess:true})}
+          } else {
+            this.setState({photoSuccess: true});
+          }
         }
-      }else{
-        this.setState({passwordSuccess:false})
+      } else {
+        this.setState({passwordSuccess: false});
       }
       const done =
         this.state.passwordSuccess &&
@@ -214,6 +256,45 @@ export default class Languages extends Component {
 
   constructor(props) {
     super(props);
+    var PushNotification = require('react-native-push-notification');
+
+    PushNotification.configure({
+      // (optional) Called when Token is generated (iOS and Android)
+      requestPermissions: Platform.OS === 'ios',
+      onRegister: function (token) {
+        console.log('TOKEN:', token);
+      },
+
+      // (required) Called when a remote is received or opened, or local notification is opened
+      onNotification: function (notification) {
+        console.log('NOTIFICATION:', notification);
+
+        // process the notification
+
+        // (required) Called when a remote is received or opened, or local notification is opened
+        notification.finish(PushNotificationIOS.FetchResult.NoData);
+      },
+
+      // IOS ONLY (optional): default: all - Permissions to register.
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+
+      // Should the initial notification be popped automatically
+      // default: true
+      popInitialNotification: true,
+
+      /**
+       * (optional) default: true
+       * - Specified if permissions (ios) and token (android and ios) will requested or not,
+       * - if not, you must call PushNotificationsHandler.requestPermissions() later
+       * - if you are not using remote notification or do not have Firebase installed, use this:
+       *     requestPermissions: Platform.OS === 'ios'
+       */
+      //   requestPermissions: true,
+    });
     this.state = {
       isReady: false,
       name: '',
@@ -230,7 +311,8 @@ export default class Languages extends Component {
       photoSuccess: false,
       photo: null,
       photoImported: null,
-      language:''
+      language: '',
+      nbGames: '',
     };
   }
   async takePic() {
@@ -287,7 +369,7 @@ export default class Languages extends Component {
                         rounded
                         size="large"
                         source={{
-                          uri: 'http://192.168.1.37:8082/' + this.state.photo,
+                          uri: 'http://192.168.1.40:8082/' + this.state.photo,
                         }}></Avatar>
                     )}
                     {/* <Accessory /> */}
@@ -372,6 +454,14 @@ export default class Languages extends Component {
                         this.goToProfile();
                       }}>
                       <Text style={styles.loginText}>Cancel</Text>
+                    </TouchableHighlight>
+                  </View>
+                  <View style={styles.buttons}>
+                    <TouchableHighlight
+                      underlayColor="rgba(73,182,77,1,0.9)"
+                      style={[styles.buttonContainer, styles.EditButton]}
+                      onPress={() => this.sendNotification()}>
+                      <Text style={styles.loginText}>Send Notification</Text>
                     </TouchableHighlight>
                   </View>
                 </Form>

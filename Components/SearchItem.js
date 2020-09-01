@@ -5,7 +5,7 @@ import { StyleSheet, View, Text, Image,TouchableOpacity} from 'react-native'
 const SearchItem =(props)=> {
 
     return (
-      <TouchableOpacity style={styles.main_container} >
+      <TouchableOpacity style={styles.main_container} onPress={()=>props.navigation("Offers",{game:props.game})}>
         <Image
           style={styles.image}
           source={{uri : props.game.imageURI}}

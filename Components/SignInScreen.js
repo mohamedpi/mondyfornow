@@ -84,6 +84,8 @@ export default class LoginView extends Component {
       passVisible: true,
       language:"",
       res: 200,
+      nbGames:0,
+      liked:""
     };
   }
  
@@ -122,7 +124,7 @@ export default class LoginView extends Component {
 
   async login(email, password) {
     try {
-      const res = await axios.post('http://192.168.1.37:8082/user/login', {
+      const res = await axios.post('http://192.168.1.40:8082/user/login', {
         email: email,
         password: password,
       });
@@ -137,24 +139,38 @@ export default class LoginView extends Component {
 
         try {
           const resp = await axios.get(
-            `http://192.168.1.37:8082/user/getUser/?id=${decoded._id}`,
+            `http://192.168.1.40:8082/user/getUser/?id=${decoded._id}`,
           );
           this.setState({
             userName: resp.data.name,
             userEmail: resp.data.email,
             language:resp.data.language
+            ,userId:resp.data._id,liked:resp.data.liked
           });
         } catch (error) {
           console.log(error);
         }
 
         try {
-          await AsyncStorage.setItem('userId', decoded._id);
+          const resp = await axios.get(
+            'http://192.168.1.40:8082/games/countGames',
+          );
+this.setState({nbGames:resp.data.games});
+console.log("state"+this.state.nbGames)
+        } catch (error) {
+          console.log(error);
+        }
+
+        try {
+          await AsyncStorage.setItem('liked', this.state.liked);
+          await AsyncStorage.setItem('userId', this.state.userId);
           await AsyncStorage.setItem('token', token);
           await AsyncStorage.setItem('isLogged', '1');
           await AsyncStorage.setItem('userName', this.state.userName);
           await AsyncStorage.setItem('userEmail', this.state.userEmail);
           await AsyncStorage.setItem('userLanguage', this.state.language);
+          await AsyncStorage.setItem('nbGames', this.state.nbGames.toString());
+          await AsyncStorage.setItem('pushNotif', "true");
         } catch (error) {
           console.log(error);
         }

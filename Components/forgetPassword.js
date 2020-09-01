@@ -93,7 +93,7 @@ export default class LoginView extends Component {
     }
     try {
       const res = await axios.post(
-        'http://192.168.1.37:8082/user/verifyEmail',
+        'http://192.168.1.40:8082/user/verifyEmail',
         {
           email: this.state.email,
         },
@@ -102,7 +102,7 @@ export default class LoginView extends Component {
       if (res.status == 200) {
         try {
           const resp = await axios.post(
-            'http://192.168.1.37:8082/user/forget-password',
+            'http://192.168.1.40:8082/user/forget-password',
             {
               email: this.state.email,
             },
