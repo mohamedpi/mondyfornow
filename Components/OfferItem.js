@@ -18,6 +18,8 @@ import * as Animatable from 'react-native-animatable';
 
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from "axios"
+import {connect} from "react-redux"
+
 
 const MIN_HEIGHT = Platform.OS === 'ios' ? 90 : 55;
 const MAX_HEIGHT = 350;
@@ -31,34 +33,37 @@ var likeheart   =require("../assets/coloredheart.png")
 const OfferItem = (props) => {
   const {offer} = props.route.params
   const [id,setID]  = useState("")
-  const [favorite,setFavorite]  = useState(false)
+  const [favorite,setFavorite] = useState(false)
 
   useEffect(()=>{
-    async function getID(){
-     try{
+    async function updateData()
+    {
           const id = await AsyncStorage.getItem('userId');
           setID(id)
-        }
-     catch (err) {
-       console.log(err.message);
-          }
-     }
- getID()
-  })
 
-  const  toggleImage = favorite =>{
+    }
+    updateData()
+    let offerExist = props.liked.find(element => element._id === offer._id)
+    if(offerExist)
+    setFavorite(true)
+    else
+    setFavorite(false)
+})
+
+  const  toggleImage =async (favorite) =>{
    if(favorite)
    {
-     axios.put(`http://192.168.43.173:5000/games/removeFavorite/${id}`,offer)
+     axios.put(`http://192.168.43.173:8082/games/removeFavorite/${id}`,offer)
    }
    else {
-       axios.put(`http://192.168.43.173:5000/games/addFavorite/${id}`,offer)
+       axios.put(`http://192.168.43.173:8082/games/addFavorite/${id}`,offer)
    }
    setFavorite(!favorite)
+
  }
  //add to card :
  const addToCard = ()=>{
-   axios.put(`http://192.168.43.173:5000/games/addToCard/${id}`,offer)
+   axios.put(`http://192.168.43.173:8082/games/addToCard/${id}`,offer)
  }
 
   return (
@@ -189,5 +194,7 @@ const styles = StyleSheet.create({
 
   }
 });
-
-export default OfferItem;
+const mapStateToProps  = state =>({
+  liked : state.liked
+})
+export default connect(mapStateToProps) (OfferItem);

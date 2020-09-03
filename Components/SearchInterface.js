@@ -16,7 +16,7 @@ function SearchInterface(props){
   useEffect(()=>{
     async function getData()
    {
-    const response = await Axios.get("http://192.168.43.173:5000/games/show");
+    const response = await Axios.get("http://192.168.43.173:8082/games/show");
     setData(response.data)
    }
    getData()

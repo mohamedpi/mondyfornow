@@ -41,7 +41,7 @@ function TabNavigator()
          options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={30} />
+            <MaterialCommunityIcons name="home" color={color} size={24} />
           ),
         }} />
 
@@ -51,7 +51,7 @@ function TabNavigator()
          options={{
           tabBarLabel: 'Liked',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="heart" color={color} size={30} />
+            <MaterialCommunityIcons name="heart" color={color} size={24} />
           ),
         }}/>
 
@@ -59,14 +59,14 @@ function TabNavigator()
          options={{
           tabBarLabel: 'Search',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="cloud-search" color={color} size={30} />
+            <MaterialCommunityIcons name="cloud-search" color={color} size={24} />
           ),
         }}/>
          <Tab.Screen name="Profile" component={ProfileRouter}  options={{
            tabBarLabel: 'Profile',
            activeBackgroundColor: "red",
            tabBarIcon: ({ color, size }) => (
-             <MaterialCommunityIcons name="face-profile" color={color} size={30} />
+             <MaterialCommunityIcons name="face-profile" color={color} size={24} />
            ),
          }}/>
        </Tab.Navigator>

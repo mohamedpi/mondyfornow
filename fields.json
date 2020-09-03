@@ -37,6 +37,15 @@
     },
     "Profile":{
         "Edit":"Edit profile",
-        "Search History": "Search History"
+        "ChangePassword": "Change Password",
+        "Language":"Language",
+        "CreditCard":"Credit Card Info",
+        "PushNotifications":"Push Notifications",
+        "AboutUs":"About US",
+        "Our partners":"Our partners",
+        "Send Feedback":"Send FeedBack",
+        "Account":"Account",
+        "More":"More",
+        "LogOut":"Log Out"
     }
 }

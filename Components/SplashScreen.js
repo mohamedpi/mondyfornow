@@ -6,9 +6,10 @@ import {
   StyleSheet,
   Animated,
   ActivityIndicator,
+  AsyncStorage
 } from 'react-native';
 import {Dimensions, Alert} from 'react-native';
-// import { Actions } from 'react-native-router-flux';
+import { Actions } from 'react-native-router-flux';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -48,14 +49,17 @@ export default class SplashScreen extends Component {
     );
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+         try {
+      const isLogged = await AsyncStorage.getItem('isLogged');
+
     const {logoAnimation, textAnimation} = this.state;
     Animated.parallel([
       Animated.spring(logoAnimation, {
         toValue: 1,
         tension: 10,
         friction: 2,
-        duration: 1200,
+        duration: 2000,
         useNativeDriver: false,
       }).start(),
 
@@ -68,13 +72,21 @@ export default class SplashScreen extends Component {
       // this.setState({
       //     loadingSpinner: true,
       // });
-      // setTimeout(switchToAuth, 1500);
+    setTimeout(() => {
+      if (isLogged == 1) Actions.SignIn();
+      else Actions.SignIn();
+    }, 1500);
     });
     BackHandler.addEventListener(
       'hardwareBackPress',
       this.handleBackButtonClick,
     );
   }
+  catch(error){
+    console.log(error)
+  }
+}
+
   constructor(props) {
     super(props);
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
@@ -85,6 +97,7 @@ export default class SplashScreen extends Component {
       <View style={styles.container}>
         <Animated.View
           style={{
+
             opacity: this.state.logoAnimation,
             top: this.state.logoAnimation.interpolate({
               inputRange: [0, 1],
@@ -121,6 +134,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#162447',
     flex: 1,
+    alignSelf:'center'
   },
   logoText: {
     color: 'white',
@@ -130,6 +144,9 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: screenWidth,
-    height: screenHeight * 0.5,
+    height: screenHeight*0.7,
+    alignSelf:"center",
+    alignItems:"center",
+    position:"relative"
   },
 });

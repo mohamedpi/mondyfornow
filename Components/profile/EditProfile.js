@@ -9,11 +9,16 @@ import {
   TouchableHighlight,
   ScrollView,
   AsyncStorage,
+  Alert,
 } from 'react-native';
+import {Avatar, ListItem, Icon, Accessory} from 'react-native-elements';
 import {Container, Content, Form, Text, View, H3} from 'native-base';
 import {Actions} from 'react-native-router-flux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import axios from 'axios';
+import ImagePicker from 'react-native-image-picker';
+import PushNotification from 'react-native-push-notification';
+
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
@@ -21,92 +26,217 @@ export default class Languages extends Component {
   goToProfile() {
     Actions.profile();
   }
+//naamel variable fel async storage est ce que activé l push notifs wale
+  async getGamesNumber() {
+    try {
+      const nb = await AsyncStorage.getItem('nbGames');
+
+      const resp = await axios.get('http://192.168.43.173:8082/games/countGames');
+      // console.log("resp data "+resp.data);
+      console.log('nb games state ' + nb);
+      if (parseInt(resp.data.games, 10) > parseInt(nb, 10)) {
+        try {
+          await AsyncStorage.removeItem('nbGames');
+          await AsyncStorage.setItem('nbGames', resp.data.games.toString());
+          const pushNotif = await AsyncStorage.getItem('pushNotif');
+          if(pushNotif=="true")
+            PushNotification.localNotification({
+              title: 'New game', // (optional)
+              message: 'There is a new game in store, make sure to check it', // (required)
+            });
+
+          // setState({nbGames});
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async componentDidMount() {
+    try {
+      const id = await AsyncStorage.getItem('userId');
+      const language = await AsyncStorage.getItem('userLanguage');
+      this.setState({id, language});
+      setInterval(this.getGamesNumber, 10000);
+
+      try {
+        const resp = await axios.get(
+          `http://192.168.43.173:8082/user/getUser/?id=${id}`,
+        );
+        console.log(resp.data);
+        this.setState({
+          photo: resp.data.userImage,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  sendNotification() {
+    PushNotification.localNotification({
+      title: 'My Notification Title', // (optional)
+      message: 'My Notification Message', // (required)
+    });
+  }
+
   async submit() {
     try {
       var id = await AsyncStorage.getItem('userId');
+
       var token = await AsyncStorage.getItem('token');
 
-      try {
-        //name
-        const res = await axios({
-          method: 'put',
-          url: 'http://192.168.43.124:8082/profile/updateName',
-          data: {_id: id, name: this.state.name},
-          headers: {
-            'auth-token': token,
-          },
-        });
-        if (res.status == 200) {
-          console.log('success name');
-          this.setState({
-            nameSuccess: true,
+      if (this.state.password != '') {
+        try {
+          const res = await axios({
+            method: 'post',
+            url: 'http://192.168.43.173:8082/profile/verifyPassword',
+            data: {id: id, password: this.state.password},
+            headers: {
+              'auth-token': token,
+            },
           });
+          if (res.status == 200) {
+            console.log('success password');
+            this.setState({passwordSuccess: true});
+          }
+        } catch (error) {
+          if (error.response.status == 401)
+            this.setState({passwordExists: true});
         }
-      } catch (error) {
-        console.log(error + 'updateName');
-      }
-      //avatar
-      try {
-        const res = await axios({
-          method: 'put',
-          url: 'http://192.168.43.124:8082/profile/updateAvatar',
-          data: {_id: id, avatar: this.state.avatar},
-          headers: {
-            'auth-token': token,
-          },
-        });
-        if (res.status == 200) {
-          console.log('success avatar');
-          this.setState({
-            avatarSuccess: true,
-          });
+        if (this.state.passwordSuccess) {
+          if (this.state.name != '') {
+            try {
+              //name
+              const res = await axios({
+                method: 'put',
+                url: 'http://192.168.43.173:8082/profile/updateName',
+                data: {_id: id, name: this.state.name},
+                headers: {
+                  'auth-token': token,
+                },
+              });
+              if (res.status == 200) {
+                console.log('success name');
+                this.setState({
+                  nameSuccess: true,
+                });
+              }
+            } catch (error) {
+              console.log(error + 'updateName');
+            }
+          } else {
+            this.setState({
+              nameSuccess: true,
+            });
+          }
+          //avatar
+          if (this.state.avatar != '') {
+            try {
+              const res = await axios({
+                method: 'put',
+                url: 'http://192.168.43.173:8082/profile/updateAvatar',
+                data: {_id: id, avatar: this.state.avatar},
+                headers: {
+                  'auth-token': token,
+                },
+              });
+              if (res.status == 200) {
+                console.log('success avatar');
+                this.setState({
+                  avatarSuccess: true,
+                });
+              }
+            } catch (error) {
+              console.log(error);
+              if (error.response.status == 400)
+                this.setState({avatarExists: true});
+            }
+          } else {
+            this.setState({
+              avatarSuccess: true,
+            });
+          }
+          //email
+          if (this.state.email != '') {
+            try {
+              const res = await axios({
+                method: 'put',
+                url: 'http://192.168.43.173:8082/profile/updateEmail',
+                data: {_id: id, email: this.state.email},
+                headers: {
+                  'auth-token': token,
+                },
+              });
+              if (res.status == 200) {
+                console.log('success email');
+                this.setState({
+                  emailSuccess: true,
+                });
+              }
+            } catch (error) {
+              console.log(error);
+              if (error.response.status == 401)
+                this.setState({emailExists: true});
+            }
+          } else {
+            this.setState({
+              emailSuccess: true,
+            });
+          }
+          //password
+
+          //profile pic
+          if (this.state.photoImported) {
+            console.log('photoImported' + this.state.photoImported);
+            if (this.state.photoImported != null) {
+              let uri = this.state.photoImported.uri;
+              let formData = new FormData();
+              let filename = uri.split('/').pop();
+              console.log(filename);
+              formData.append('userImage', {
+                uri: this.state.photoImported.uri,
+                type: this.state.photoImported.type,
+                name: this.state.photoImported.fileName,
+              });
+              formData.append('id', id);
+              console.log('formdata' + formData);
+              try {
+                const res = await axios({
+                  method: 'put',
+                  url: 'http://192.168.43.173:8082/profile/updatePhoto',
+                  data: formData,
+                  headers: {
+                    Accept: 'application/json',
+                    'content-type': 'multipart/form-data',
+                  },
+                });
+                if (res.status == 200) {
+                  console.log('success photo');
+                  this.setState({photoSuccess: true});
+                }
+              } catch (error) {
+                console.log(error);
+              }
+            }
+          } else {
+            this.setState({photoSuccess: true});
+          }
         }
-      } catch (error) {
-        console.log(error);
-        if (error.response.status == 400) this.setState({avatarExists: true});
-      }
-      //email
-      try {
-        const res = await axios({
-          method: 'put',
-          url: 'http://192.168.43.124:8082/profile/updateEmail',
-          data: {_id: id, email: this.state.email},
-          headers: {
-            'auth-token': token,
-          },
-        });
-        if (res.status == 200) {
-          console.log('successemail');
-          this.setState({
-            emailSuccess: true,
-          });
-        }
-      } catch (error) {
-        console.log(error);
-        if (error.response.status == 401) this.setState({emailExists: true});
-      }
-      //password
-      try {
-        const res = await axios({
-          method: 'put',
-          url: 'http://192.168.43.124:8082/profile/updatePassword',
-          data: {_id: id, password: this.state.password},
-          headers: {
-            'auth-token': token,
-          },
-        });
-        if (res.status == 200) {
-          console.log('success');
-          this.setState({passwordSuccess: true});
-        }
-      } catch (error) {
-        if (error.response.status == 401) this.setState({passwordExists: true});
+      } else {
+        this.setState({passwordSuccess: false});
       }
       const done =
         this.state.passwordSuccess &&
         this.state.avatarSuccess &&
         this.state.nameSuccess &&
-        this.state.emailSuccess;
+        this.state.emailSuccess &&
+        this.state.photoSuccess;
       if (done) {
         try {
           if (this.state.name != '')
@@ -123,8 +253,48 @@ export default class Languages extends Component {
       console.log(error + 'storage');
     }
   }
+
   constructor(props) {
     super(props);
+    var PushNotification = require('react-native-push-notification');
+
+    PushNotification.configure({
+      // (optional) Called when Token is generated (iOS and Android)
+      requestPermissions: Platform.OS === 'ios',
+      onRegister: function (token) {
+        console.log('TOKEN:', token);
+      },
+
+      // (required) Called when a remote is received or opened, or local notification is opened
+      onNotification: function (notification) {
+        console.log('NOTIFICATION:', notification);
+
+        // process the notification
+
+        // (required) Called when a remote is received or opened, or local notification is opened
+        notification.finish(PushNotificationIOS.FetchResult.NoData);
+      },
+
+      // IOS ONLY (optional): default: all - Permissions to register.
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+
+      // Should the initial notification be popped automatically
+      // default: true
+      popInitialNotification: true,
+
+      /**
+       * (optional) default: true
+       * - Specified if permissions (ios) and token (android and ios) will requested or not,
+       * - if not, you must call PushNotificationsHandler.requestPermissions() later
+       * - if you are not using remote notification or do not have Firebase installed, use this:
+       *     requestPermissions: Platform.OS === 'ios'
+       */
+      //   requestPermissions: true,
+    });
     this.state = {
       isReady: false,
       name: '',
@@ -137,13 +307,33 @@ export default class Languages extends Component {
       nameSuccess: false,
       avatarSuccess: false,
       emailSuccess: false,
-      passwordSuccess: false,
+      passwordSuccess: true,
+      photoSuccess: false,
+      photo: null,
+      photoImported: null,
+      language: '',
+      nbGames: '',
     };
   }
+  async takePic() {
+    return new Promise((resolve) => {
+      const options = {
+        noData: true,
+      };
+      ImagePicker.launchImageLibrary(options, (response) => {
+        console.log('response', response);
+
+        if (response.uri) {
+          this.setState({photoImported: response});
+        }
+      });
+    });
+  }
+
   render() {
     const avatarE = 'This avatar already exists';
     const emailE = 'This email already exists';
-    const passwordE = 'This password is the same, please change it';
+    const passwordE = 'Please type a correct password';
     return (
       <View>
         <SafeAreaView>
@@ -154,14 +344,43 @@ export default class Languages extends Component {
                 <Form>
                   <View style={{height: screenHeight * 0.04}}></View>
                   <H3 style={styles.profileHeaderStyles}>Edit Profile</H3>
-                  <View style={{height: screenHeight * 0.08}}></View>
+                  <View style={styles.userImage}>
+                    {this.state.photoImported != null ? (
+                      <Avatar
+                        accessory={{
+                          style: {backgroundColor: 'red'},
+                        }}
+                        onPress={() => {
+                          this.takePic();
+                        }}
+                        rounded
+                        size="large"
+                        source={{
+                          uri: this.state.photoImported.uri,
+                        }}></Avatar>
+                    ) : (
+                      <Avatar
+                        accessory={{
+                          style: {backgroundColor: 'red'},
+                        }}
+                        onPress={() => {
+                          this.takePic();
+                        }}
+                        rounded
+                        size="large"
+                        source={{
+                          uri: 'http://192.168.43.173:8082/' + this.state.photo,
+                        }}></Avatar>
+                    )}
+                    {/* <Accessory /> */}
+                  </View>
                   {this.state.avatarExists ? (
                     <Text style={{color: 'red'}}>{avatarE}</Text>
                   ) : null}
                   {this.state.emailExists ? (
                     <Text style={{color: 'red'}}>{emailE}</Text>
                   ) : null}
-                  {this.state.passwordExists ? (
+                  {!this.state.passwordSuccess ? (
                     <Text style={{color: 'red'}}>{passwordE}</Text>
                   ) : null}
                   <View style={styles.inputContainer}>
@@ -237,6 +456,14 @@ export default class Languages extends Component {
                       <Text style={styles.loginText}>Cancel</Text>
                     </TouchableHighlight>
                   </View>
+                  <View style={styles.buttons}>
+                    <TouchableHighlight
+                      underlayColor="rgba(73,182,77,1,0.9)"
+                      style={[styles.buttonContainer, styles.EditButton]}
+                      onPress={() => this.sendNotification()}>
+                      <Text style={styles.loginText}>Send Notification</Text>
+                    </TouchableHighlight>
+                  </View>
                 </Form>
               </Content>
             </Container>
@@ -274,6 +501,9 @@ const styles = StyleSheet.create({
     fontFamily: 'GlueGun-GW8Z',
     fontSize: 25,
     color: '#dce0e9',
+  },
+  userImage: {
+    alignItems: 'center',
   },
   inputContainer: {
     borderBottomColor: '#F5FCFF',

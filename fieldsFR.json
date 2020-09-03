@@ -1,0 +1,51 @@
+{
+  "splashScreen": {
+    "SignIn": "Se connecter",
+    "SignUp": "S'inscrire",
+    "SignInFb": "Se connecter avec Facebook"
+  },
+  "SignIn": {
+    "Email": "Email",
+    "Password": "Mot de passe",
+    "SignIn": "Se connecter",
+    "FingerPrint": "Se connecter avec l'empreinte",
+    "noAccount": "Vous n'avez pas de compte? Inscrivez-vous ici."
+  },
+  "SignUp": {
+    "Email": "Email",
+    "Password": "Mot de passe",
+    "Name": "Nom",
+    "Avatar": "Avatar",
+    "Photo": "Veuillez choisir une photo",
+    "SignUp": "S'inscrire",
+    "FingerPrint": "Login with fingerprint",
+    "withAccount": "Vous avez déjà un compte? Connectez-vous ici."
+  },
+  "Home": {
+    "HotList": "Parcourir notre hot list",
+    "NewOffers": "Voir nos nouvelles offres",
+    "Discounts": "Promotion"
+  },
+  "Catalog": {
+    "Welcome": "Bienvenue à la page catalogue"
+  },
+  "Liked": {
+    "Welcome": "Votre liste de souhaits"
+  },
+  "Search": {
+    "Welcome": "Bienvenue à la page de recherche"
+  },
+  "Profile":{
+        "Edit":"Modifier le profile",
+        "ChangePassword": "Changer le mot de passe",
+        "Language":"Langue",
+        "CreditCard":"Coordonnées de paiement",
+        "PushNotifications":"Push Notifications",
+        "AboutUs":"A propos de nous",
+        "Our partners":"Nos partenaires",
+        "Send Feedback":"Envoyer un avis",
+        "Account":"Compte",
+        "More":"Plus",
+        "LogOut":"Deconnexion"
+    }
+}

@@ -8,23 +8,68 @@ import {
   LayoutAnimation,
   UIManager,
   Platform,
+  AsyncStorage
 } from 'react-native';
 import RadioButton from 'react-native-radio-button';
 import {ListItem} from 'react-native-elements';
 import {Actions} from 'react-native-router-flux';
+import axios from 'axios';
 
 export default class Languages extends Component {
+
+async componentDidMount(){
+   try {
+      const language = await AsyncStorage.getItem('userLanguage');
+      const token = await AsyncStorage.getItem('token');
+      const id = await AsyncStorage.getItem('userId');
+      this.setState({language,id,token});
+      if(language=="en"){
+        this.setState({isSelectedEN:true,isSelectedFR:false})
+      }else if(language=="fr"){
+        this.setState({isSelectedFR: true,isSelectedEN:false});
+      }
+    } catch (error) {
+      console.log(error);
+    }
+}
+
                  constructor() {
                    super();
                    this.state = {
-                     language: 'en',
+                     language: '',
                      isSelectedEN: true,
                      isSelectedFR: false,
+                     id:'',
+                     token:'',
                    };
                  }
 
-                 goToProfile() {
-                   Actions.profile();
+           async      goToProfile() {
+                         try {
+     const resp = await axios({
+            method: 'put',
+            url: 'http://192.168.43.173:8082/profile/updateLanguage',
+            data: {id: this.state.id, language: this.state.language},
+            headers: {
+              'auth-token': this.state.token,
+            },
+          });
+        console.log(resp.data.message);
+        this.setState({
+          language: resp.data.language,
+        });
+        console.log(resp.status)
+        if (resp.status == 200)
+          try {
+            await AsyncStorage.setItem('userLanguage', this.state.language);
+          } catch (error) {
+            console.log(error);
+          }
+        Actions.profile();
+      } catch (error) {
+        console.log(error+"language");
+      }
+      
                  }
                  render() {
                    return (

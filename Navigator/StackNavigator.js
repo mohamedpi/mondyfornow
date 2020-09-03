@@ -27,7 +27,7 @@ function MyHomeStack(props) {
     async function fetchUser()
     {
       const id = await AsyncStorage.getItem('userId');
-      const resp = await axios(`http://192.168.43.173:5000/user/getUser/${id}`)
+      const resp = await axios(`http://192.168.43.173:8082/user/getUser/?id=${id}`)
       setUser(resp.data)
       setPanier(resp.data.panier.length)
     }

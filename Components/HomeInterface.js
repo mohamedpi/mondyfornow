@@ -20,28 +20,22 @@ function HomeInterface(props){
   useEffect(()=>{
     async function getData()
    {
-    const response = await Axios.get("http://192.168.43.173:5000/games/show");
+    const response = await Axios.get("http://192.168.43.173:8082/games/show");
     props.getGames(response.data)
   }
-  async function fetchUser()
-  {
-    const id = await AsyncStorage.getItem('userId');
-    const resp = await axios(`http://192.168.43.173:5000/user/getUser/${id}`)
-    setUser(resp.data.panier)
 
-  }
-    fetchUser()
+
     getData()
 
- },props.games,user)
+ })
 
  return(
    <>
    <Modal isVisible={props.visible} coverScreen={true}>
           <View style={{flex: 1,backgroundColor:"white"}}>
-            {user.map(item=>(
+            {props.panier.map(item=>(
                 <View>
-                   <Text>{item.title}hey m</Text>
+                   <Text>{item.title}</Text>
                 </View>
               ))}
             <Button title="Hide modal" onPress={()=>props.setVisibility(false)} />
@@ -260,7 +254,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state =>({
   games : state.games,
-  visible:state.visible
+  visible:state.visible,
+  panier:state.panier
 })
 
 export default connect(mapStateToProps,{getGames,setVisibility})(HomeInterface)

@@ -15,8 +15,10 @@ import Chevron from './Chevron';
 import InfoText from './InfoText';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Actions} from 'react-native-router-flux';
-import Axios from 'axios';
+import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
+// import Names from 'C:Usersguira\react nativemondyfornow\fields.json';
+// import NamesFr from '../fieldsFR.json';
 
 class SettingsScreen extends Component {
   // static propTypes = {
@@ -33,10 +35,25 @@ class SettingsScreen extends Component {
   async componentDidMount() {
     try {
       const id = await AsyncStorage.getItem('userId');
-      const name = await AsyncStorage.getItem('userName');
-      const email = await AsyncStorage.getItem('userEmail');
-      console.log(name);
-      this.setState({userEmail: email, userName: name});
+      // const name = await AsyncStorage.getItem('userName');
+      // const email = await AsyncStorage.getItem('userEmail');
+      // console.log(name);
+      // this.setState({userEmail: email, userName: name});
+      this.setState({id: id});
+      try {
+        const resp = await axios.get(
+          `http://192.168.43.173:8082/user/getUser/?id=${id}`,
+        );
+        console.log(resp.data);
+        this.setState({
+          userName: resp.data.name,
+          userEmail: resp.data.email,
+          photo: resp.data.userImage,
+          language: resp.data.language,
+        });
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -44,11 +61,14 @@ class SettingsScreen extends Component {
   constructor() {
     super();
     this.state = {
+      id: '',
       pushNotifications: true,
       darkMode: false,
       userName: '',
       userEmail: '',
       photo: null,
+      photoImported: null,
+      language:'',
     };
   }
 
@@ -56,10 +76,16 @@ class SettingsScreen extends Component {
     this.props.navigation.navigate('options');
   };
 
-  onChangePushNotifications = () => {
-    this.setState((state) => ({
+  onChangePushNotifications= async() => {
+    this.setState((state)=>({
       pushNotifications: !state.pushNotifications,
     }));
+      try {
+          await AsyncStorage.removeItem('pushNotif');
+          await AsyncStorage.setItem('pushNotif', this.state.pushNotifications.toString());
+        } catch (error) {
+          console.log(error); 
+        }
   };
 
   onChangeDarkMode = () => {
@@ -75,8 +101,14 @@ class SettingsScreen extends Component {
     Actions.Edit();
   }
 
-  logOut() {
-    Actions.Splash({type: 'reset'});
+ async logOut() {
+    try {
+          await AsyncStorage.removeItem('isLogged');
+          Actions.Splash();
+        } catch (error) {
+          console.log(error);
+        }
+    
   }
 
   gotToCreditCard() {
@@ -87,60 +119,43 @@ class SettingsScreen extends Component {
     Actions.AboutUs();
   }
 
-  takePic() {
-    const options = {
-      noData: true,
-    };
-    ImagePicker.launchImageLibrary(options, (response) => {
-      console.log('response', response);
-
-      if (response.uri) {
-        this.setState({photo: response});
-      }
-    });
-        let uri = this.state.photo.uri;
-        let formData = new FormData();
-        let filename = uri.split('/').pop();
-        console.log(filename);
-        formData.append('userImage', {
-          uri: this.state.photo.uri,
-          type: this.state.photo.type,
-          name: this.state.photo.fileName,
-        });
- const header = {
-   Accept: 'application/json',
-   'content-type': 'multipart/form-data',
- };
- fetch('http://192.168.43.124:8082/profile/updatePhoto', {
-   method: 'POST',
-   headers: header,
-   body: formData,
- })
-   .then((response) => response.json())
-   .then((res) => console.log(res))
-   .catch((err) => console.log('err', err));
+  goToPassword() {
+    Actions.changePass();
+  }
+  
+  goToFeedback(){
+    Actions.feedback();
   }
 
   render() {
-    const {avatar} = this.props;
+    const avatar = this.state.photo;
     const name = this.state.userName;
     const email = this.state.userEmail;
     return (
       <ScrollView style={styles.scroll}>
         <View style={styles.userRow}>
           <View style={styles.userImage}>
-            <Avatar
-              accessory={{style: {backgroundColor: "red"}}}
-              onPress={() => {
-                this.takePic();
-              }}
-              rounded
-              size="large"
-              source={{
-                uri: this.state.photo == null ? avatar : this.state.photo.uri,
-              }}>
-              <Accessory />
-            </Avatar>
+            {this.state.photoImported != null ? (
+              <Avatar
+                accessory={{style: {backgroundColor: 'red'}}}
+                rounded
+                size="large"
+                source={{
+                  uri: this.state.photoImported.uri,
+                }}></Avatar>
+            ) : (
+              <Avatar
+                accessory={{style: {backgroundColor: 'red'}}}
+                onPress={() => {
+                  this.takePic();
+                }}
+                rounded
+                size="large"
+                source={{
+                  uri: 'http://192.168.43.173:8082/' + this.state.photo,
+                }}></Avatar>
+            )}
+            {/* <Accessory /> */}
           </View>
           <View>
             <Text style={{fontSize: 16}}>{name}</Text>
@@ -152,7 +167,7 @@ class SettingsScreen extends Component {
               {email}
             </Text>
           </View>
-          <View style={{height: 10}}></View>
+          <View style={{height: 10, alignContent: 'space-between'}}></View>
           <TouchableOpacity onPress={() => this.logOut()}>
             <View style={styles.logOutView}>
               <Text style={styles.logOutText}>Log out</Text>
@@ -199,13 +214,6 @@ class SettingsScreen extends Component {
               <Switch
                 trackColor={{true: 'red', false: 'black'}}
                 thumbColor="#FFFFFF"
-                // thumbColor={[
-                //   Platform.OS == 'ios'
-                //     ? '#FFFFFF'
-                //     : this.state.darkMode
-                //     ? '#7ab8e1'
-                //     : '#ffffff',
-                // ]}
                 onValueChange={this.onChangeDarkMode}
                 value={this.state.darkMode}
               />
@@ -254,8 +262,23 @@ class SettingsScreen extends Component {
             rightIcon={<Chevron />}
           />
           <ListItem
+            title="Change Password"
+            onPress={() => this.goToPassword()}
+            containerStyle={styles.listItemContainer}
+            leftIcon={
+              <BaseIcon
+                containerStyle={{backgroundColor: 'black'}}
+                icon={{
+                  type: 'material',
+                  name: 'lock',
+                }}
+              />
+            }
+            rightIcon={<Chevron />}
+          />
+          <ListItem
             title="Language"
-            rightTitle="English"
+            rightTitle={this.state.language == 'en' ? 'English' : 'French'}
             rightTitleStyle={{fontSize: 15}}
             onPress={() => this.goToLanguages()}
             containerStyle={styles.listItemContainer}
@@ -289,7 +312,7 @@ class SettingsScreen extends Component {
             rightIcon={<Chevron />}
           />
           <ListItem
-            title="Terms and Policies"
+            title="Our partners"
             // onPress={() => this.onPressOptions()}
             containerStyle={styles.listItemContainer}
             leftIcon={
@@ -303,43 +326,10 @@ class SettingsScreen extends Component {
             }
             rightIcon={<Chevron />}
           />
-          <ListItem
-            title="Share our App"
-            // onPress={() => this.onPressOptions()}
-            containerStyle={styles.listItemContainer}
-            leftIcon={
-              <BaseIcon
-                containerStyle={{
-                  backgroundColor: 'black',
-                }}
-                icon={{
-                  type: 'entypo',
-                  name: 'share',
-                }}
-              />
-            }
-            rightIcon={<Chevron />}
-          />
-          <ListItem
-            title="Rate Us"
-            // onPress={() => this.onPressOptions()}
-            containerStyle={styles.listItemContainer}
-            leftIcon={
-              <BaseIcon
-                containerStyle={{
-                  backgroundColor: 'black',
-                }}
-                icon={{
-                  type: 'entypo',
-                  name: 'star',
-                }}
-              />
-            }
-            rightIcon={<Chevron />}
-          />
+
           <ListItem
             title="Send FeedBack"
-            // onPress={() => this.onPressOptions()}
+            onPress={() => this.goToFeedback()}
             containerStyle={styles.listItemContainer}
             leftIcon={
               <BaseIcon
@@ -364,6 +354,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   userRow: {
+    alignContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
     paddingBottom: 8,
