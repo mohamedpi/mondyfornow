@@ -66,6 +66,7 @@ const OfferItem = (props) => {
    axios.put(`http://192.168.43.173:8082/games/addToCard/${id}`,offer)
  }
 
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />

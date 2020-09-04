@@ -36,13 +36,13 @@ useEffect(()=>{
     const resp = await axios(`http://192.168.43.173:8082/user/getUser/?id=${id}`)
     setList(resp.data.liked)
     props.setLiked(resp.data.liked)
-    props.setPanier(resp.data.panier)
+    //props.setPanier(resp.data.panier)
 
   }
   fetchUser()
 })
                 // async componentDidMount() {
-                  // try{
+                  // try{p
 
                       //  var id  = await AsyncStorage.getItem("userId")
                       //  var liked = await AsyncStorage.getItem('@MySuperStore:key')
@@ -116,7 +116,7 @@ useEffect(()=>{
                                  bottomDivider
                                  rightIcon={
                                    <AntDesign
-                                     name="heart"
+                                     name="close"
                                      color="red"
                                      size={20}
                                      onPress={() => {
@@ -150,4 +150,9 @@ const styles = StyleSheet.create({
     color: '#dce0e9',
   },
 });
+const mapStateToProps = state  =>({
+panier : state.panier,
+liked : state.liked
+
+})
 export default connect(null,{setLiked,setPanier})(LikedInterface)
