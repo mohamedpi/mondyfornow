@@ -3,7 +3,6 @@ import {View,Text,Image,SafeAreaView,StyleSheet,ScrollView,TouchableOpacity,Asyn
 import { Button, ThemeProvider,Card,ListItem,Avatar} from 'react-native-elements';
 import { createStackNavigator } from '@react-navigation/stack';
 import {connect} from "react-redux"
-import {getGames} from "../actions/actions"
 import {setVisibility} from "../actions/actions"
 import Axios from "axios"
 import Swiper from "react-native-swiper"
@@ -15,7 +14,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 
 function HomeInterface(props){
   const [user,setUser] = useState([{title:"fuck ou"}])
-  const [resp,setResp] = useState({id:"5f52405023a2d941fc3892d9",
+  const [resp,setResp] = useState({
   games:[{
         name: "game name",
         details: "details",
@@ -54,7 +53,7 @@ function HomeInterface(props){
         discount: false,
         new: true
     }],
-  discount:[{
+  discounts:[{
         _id: "5f28313cc6526a10de5b04b4",
         imageURI: "https://previews.123rf.com/images/iuriimotov/iuriimotov1802/iuriimotov180200065/95134518-litecoin-crypto-currency-3d-isometric-physical-coins-digital-currency-golden-and-silver-coins-with-l.jpg",
         title: "ultimate discount",
@@ -64,31 +63,82 @@ function HomeInterface(props){
         gameID: "5f220a8bf311c848cc1fc701",
         discount: true,
         new: false
-    }]})
+    }],
+    user:{
+    "userImage": "gamePics/logo4.png",
+    "liked": [],
+    "panier": [{title:"",description:"",imageURI:"",price:""}],
+    "isVerified": true,
+    "language": "en",
+    "_id": "5f52405023a2d941fc3892d9",
+    "name": "faten3",
+    "avatar": "faten2",
+    "email": "faten2@gmail.com",
+    "password": "$2a$10$uV.pXTj1inn3YKjFvMYPfemDr4AQZzW68cyvdQR913hnlEkGkr3QC",
+    "createdAt": "2020-09-04T13:25:36.026Z",
+    "updatedAt": "2020-09-05T05:36:07.140Z",
+    "__v": 0
+}
+  })
 
-
-
+const gamesURL = "http://192.168.43.173:8082/games/show"
+const newOffersURL = "http://192.168.43.173:8082/offer/newOffers"
+const discountsURL = "http://192.168.43.173:8082/offer/offerDiscount"
   useEffect(()=>{
-    async function getData()
-   {
-    const games= await Axios.get("http://192.168.43.173:8082/games/show");
-    const discount = await Axios.get("http://192.168.43.173:8082/offer/offerDiscount")
-    const newOffers= await Axios.get("http://192.168.43.173:8082/offer/newOffers")
-    const id = await AsyncStorage.getItem('userId');
-    setResp({id:id,games:games.read(),newOffers:newOffers.read(),discount:discount.read(
+     async function fetchData()
+    {
+      const getGames = await Axios.get(gamesURL)
+      const getOffers =await  Axios.get(newOffersURL)
+      const getDiscounts = await Axios.get(discountsURL)
+      const id = await AsyncStorage.getItem('userId');
+      const user = await Axios.get(`http://192.168.43.173:8082/user/getUser/?id=${id}`)
 
-    )})
-  }
-    getData()
- })
+
+      //const newOffers = await Axios.get(newOffersURL)
+    //  setResp({...resp,newOffers:newOffers})
+      console.log("this is new games :" +  getGames.data +"this is newOffers : " + getOffers.data   +
+      "this is discounts :"  +getDiscounts.data +"this is user:"+user)
+      setResp({games:getGames.data,newOffers:getOffers.data,discounts:getOffers.data,user:user.data})
+    }
+     fetchData()
+},[gamesURL,newOffersURL,discountsURL])
 
  return(
    <>
+   <Modal isVisible={props.visible} coverScreen={true}>
+       <ScrollView style={{flex: 1,backgroundColor:"#121419"}}>
+         {resp.user.panier.map(item=>(
+             <View>
+             <ListItem containerStyle ={styles.listItemContainer}
+               key={3}
+              leftAvatar=<Avatar rounded source={{uri:item.imageURI}}/>
+              title=<Text style={styles.listItemTitle}>{item.title}</Text>
+              subtitle=<Text style={styles.listItemDes}>{item.description} only for <Text style ={styles.price}> {item.price}$ </Text></Text>
+              rightSubtitle=<TouchableOpacity>
+             <AntDesign
+                name="close"
+                color="red"
+                size={20}
+                onPress={() => {
+                       Axios.put(`http://192.168.43.173:8082/games/removeFromCard/${resp.id}`,item)
+                }}
+              /></TouchableOpacity>
+              bottomDivider
+             />
+             </View>
+           ))}
+
+           <View style={styles.buttonContainerModal}>
+                    <Button title="purchase" onPress={()=>console.log("purchase")} />
+                    <Button title="Hide modal" onPress={()=>props.setVisibility(false)} />
+           </View>
+
+       </ScrollView>
+ </Modal>
       <ScrollView style={styles.container}>
          <View style ={styles.sliderContainer}>
           <Swiper autoplay horizontal={false} height={200} activeDotColor="#181b20">
-          {resp.games.map(item => {return(
-            <TouchableOpacity  key={item._id} onPress={() =>props.navigation.navigate("Offers",{game:item})} style ={styles.slide}>
+          {  resp.games.map(item => ( <TouchableOpacity  key={item._id} onPress={() =>props.navigation.navigate("Offers",{game:item})} style ={styles.slide}>
              <Image
                 source={{uri: item.imageURI}}
                 resizeMode ="cover"
@@ -96,31 +146,34 @@ function HomeInterface(props){
               />
 
              </TouchableOpacity>
-          )}) }
+          )) }
           </Swiper>
           </View>
           <View>
            <Text style={styles.textStyle}>check our new offers</Text>
         </View>
         <View>
-           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} scrollEventThrottle={16}>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} scrollEventThrottle={16}>
 
-               {resp.newOffers.map((item,index) =>(
-                 <TouchableOpacity key={index} onPress={() =>props.navigation.navigate("OfferItem",{offer:item})}>
-                   <Card
-                      containerStyle={styles.cardStyle}
-                      imageStyle={styles.imageStyle}
-                      image={require('../assets/dimond4.jpg')}>
-                    </Card>
-                 </TouchableOpacity>
-               ))}
+              {
 
-           </ScrollView>
-           </View>
-           <View>
+                  resp.newOffers.map((item,index) =>(
+                <TouchableOpacity key={index} onPress={() =>props.navigation.navigate("OfferItem",{offer:item})}>
+                  <Card
+                     containerStyle={styles.cardStyle}
+                     imageStyle={styles.imageStyle}
+                     image={require('../assets/dimond4.jpg')}>
+                   </Card>
+                </TouchableOpacity>
+              ))}
+
+
+          </ScrollView>
+          </View>
+          <View>
                 <Text style={styles.textStyle}>Discounts </Text>
              </View>
-              {resp.discount.map((item,index) =>( <TouchableOpacity onPress={() =>props.navigation.navigate("OfferItem",{offer:item})}>
+              {resp.discounts.map((item,index) =>( <TouchableOpacity onPress={() =>props.navigation.navigate("OfferItem",{offer:item})}>
                 <ListItem containerStyle ={styles.listItemContainer}
                  key={index}
                  leftAvatar=<Avatar rounded source={{uri:item.imageURI}}/>
@@ -129,8 +182,6 @@ function HomeInterface(props){
                 rightSubtitle=<Text style={styles.price}>{item.price}$</Text>
                 bottomDivider
                /></TouchableOpacity>))}
-
-
 
 
       </ScrollView>
@@ -275,9 +326,9 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state =>({
-games : state.games,
+
   visible:state.visible,
- panier:state.panier
+
 })
 
-export default connect(mapStateToProps,{getGames,setVisibility})(HomeInterface)
+export default connect(mapStateToProps,{setVisibility})(HomeInterface)

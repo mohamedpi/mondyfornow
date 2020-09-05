@@ -12,7 +12,7 @@ import {ListItem} from 'react-native-elements';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import axios from 'axios';
-import {setLiked,setPanier} from "../actions/actions"
+import {setLiked} from "../actions/actions"
 import {connect} from "react-redux"
 
 function LikedInterface(props)  {
@@ -151,8 +151,8 @@ const styles = StyleSheet.create({
   },
 });
 const mapStateToProps = state  =>({
-panier : state.panier,
+//panier : state.panier,
 liked : state.liked
 
 })
-export default connect(null,{setLiked,setPanier})(LikedInterface)
+export default connect(null,{setLiked})(LikedInterface)
