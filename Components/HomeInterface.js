@@ -9,6 +9,7 @@ import Swiper from "react-native-swiper"
 import StarRating from "./StarRating"
 import OfferItem from "./OfferItem"
 import AntDesign from 'react-native-vector-icons/AntDesign';
+
 //chebbitwo
 
 function HomeInterface(props){

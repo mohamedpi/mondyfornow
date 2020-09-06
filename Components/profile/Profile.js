@@ -84,7 +84,7 @@ class SettingsScreen extends Component {
           await AsyncStorage.removeItem('pushNotif');
           await AsyncStorage.setItem('pushNotif', this.state.pushNotifications.toString());
         } catch (error) {
-          console.log(error); 
+          console.log(error);
         }
   };
 
@@ -108,7 +108,7 @@ class SettingsScreen extends Component {
         } catch (error) {
           console.log(error);
         }
-    
+
   }
 
   gotToCreditCard() {
@@ -122,7 +122,7 @@ class SettingsScreen extends Component {
   goToPassword() {
     Actions.changePass();
   }
-  
+
   goToFeedback(){
     Actions.feedback();
   }
@@ -206,30 +206,7 @@ class SettingsScreen extends Component {
               />
             }
           />
-          <ListItem
-            hideChevron
-            title="Dark Mode"
-            containerStyle={styles.listItemContainer}
-            rightElement={
-              <Switch
-                trackColor={{true: 'red', false: 'black'}}
-                thumbColor="#FFFFFF"
-                onValueChange={this.onChangeDarkMode}
-                value={this.state.darkMode}
-              />
-            }
-            leftIcon={
-              <BaseIcon
-                containerStyle={{
-                  backgroundColor: 'black',
-                }}
-                icon={{
-                  type: 'material',
-                  name: 'highlight',
-                }}
-              />
-            }
-          />
+        
           <ListItem
             // chevron
             title="Credit Card info"
@@ -311,21 +288,7 @@ class SettingsScreen extends Component {
             }
             rightIcon={<Chevron />}
           />
-          <ListItem
-            title="Our partners"
-            // onPress={() => this.onPressOptions()}
-            containerStyle={styles.listItemContainer}
-            leftIcon={
-              <BaseIcon
-                containerStyle={{backgroundColor: 'black'}}
-                icon={{
-                  type: 'entypo',
-                  name: 'light-bulb',
-                }}
-              />
-            }
-            rightIcon={<Chevron />}
-          />
+
 
           <ListItem
             title="Send FeedBack"
