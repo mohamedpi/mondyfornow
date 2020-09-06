@@ -3,7 +3,7 @@ import {View,Text,Image,StyleSheet,FlatList,ScrollView,Alert} from "react-native
 import { SearchBar } from 'react-native-elements';
 import SearchItem from "./SearchItem"
 import Axios from "axios"
-import { connect } from "react-redux";
+
 
 
 
@@ -12,15 +12,16 @@ function SearchInterface(props){
   const [dataList,setDataList]     = useState([])
   const [data,setData]  = useState("")
 
-
+ const gamesURL = "http://192.168.43.173:8082/games/show"
   useEffect(()=>{
     async function getData()
    {
-    const response = await Axios.get("http://192.168.43.173:8082/games/show");
+    const response = await Axios.get(gamesURL);
     setData(response.data)
+    console.log("this is games :" + response.data)
    }
    getData()
- })
+ },[gamesURL])
 
 const handleTextChange = (text) =>{
     setSearchText(text)
@@ -44,7 +45,7 @@ const handleTextChange = (text) =>{
           />
           </View>
           <View>
-             {dataList.map(item  => <SearchItem key ={item._id} game ={item} navigation={props.navigation.navigate}/>) }
+             {dataList && dataList.map(item  => <SearchItem key ={item._id} game ={item} navigation={props.navigation.navigate}/>) }
           </View>
 
        </ScrollView>
@@ -69,9 +70,7 @@ const styles = StyleSheet.create({
     }
 })
 
-const mapStateProps = (state) => ({
-  games: state.games
-});
 
 
-export default connect(mapStateProps)(SearchInterface);
+
+export default SearchInterface;

@@ -8,7 +8,6 @@ import { Avatar, Accessory,Badge } from 'react-native-elements';
 import OfferItem from "../Components/OfferItem"
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import axios from "axios"
-import Modal from 'react-native-modal';
 import {setVisibility} from "../actions/actions"
 import {connect} from "react-redux"
 
@@ -34,7 +33,7 @@ function MyHomeStack(props) {
 
     fetchUser()
 
-  },user.panier)
+  })
   return (
     <Stack.Navigator    screenOptions={{
 

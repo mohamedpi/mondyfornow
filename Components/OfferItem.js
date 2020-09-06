@@ -103,7 +103,7 @@ const OfferItem = (props) => {
              <Image source ={(favorite)? likeheart : whiteheart} />
              </TouchableOpacity>
              <TouchableOpacity style={styles.imageStyle} onPress={()=>addToCard()} >
-                 <Text>Add To Card</Text>
+                 <Text>Add To Cart</Text>
                 </TouchableOpacity>
         </View>
 

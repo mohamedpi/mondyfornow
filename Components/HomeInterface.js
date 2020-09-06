@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from "react"
-import {View,Text,Image,SafeAreaView,StyleSheet,ScrollView,TouchableOpacity,AsyncStorage} from "react-native"
+import {View,Text,Image,SafeAreaView,StyleSheet,ScrollView,TouchableOpacity,AsyncStorage,Modal} from "react-native"
 import { Button, ThemeProvider,Card,ListItem,Avatar} from 'react-native-elements';
 import { createStackNavigator } from '@react-navigation/stack';
 import {connect} from "react-redux"
@@ -7,13 +7,12 @@ import {setVisibility} from "../actions/actions"
 import Axios from "axios"
 import Swiper from "react-native-swiper"
 import StarRating from "./StarRating"
-import Modal from 'react-native-modal';
 import OfferItem from "./OfferItem"
 import AntDesign from 'react-native-vector-icons/AntDesign';
 //chebbitwo
 
 function HomeInterface(props){
-  const [user,setUser] = useState([{title:"fuck ou"}])
+
   const [resp,setResp] = useState({
   games:[{
         name: "game name",
@@ -105,40 +104,10 @@ const discountsURL = "http://192.168.43.173:8082/offer/offerDiscount"
 
  return(
    <>
-   <Modal isVisible={props.visible} coverScreen={true}>
-       <ScrollView style={{flex: 1,backgroundColor:"#121419"}}>
-         {resp.user.panier.map(item=>(
-             <View>
-             <ListItem containerStyle ={styles.listItemContainer}
-               key={3}
-              leftAvatar=<Avatar rounded source={{uri:item.imageURI}}/>
-              title=<Text style={styles.listItemTitle}>{item.title}</Text>
-              subtitle=<Text style={styles.listItemDes}>{item.description} only for <Text style ={styles.price}> {item.price}$ </Text></Text>
-              rightSubtitle=<TouchableOpacity>
-             <AntDesign
-                name="close"
-                color="red"
-                size={20}
-                onPress={() => {
-                       Axios.put(`http://192.168.43.173:8082/games/removeFromCard/${resp.id}`,item)
-                }}
-              /></TouchableOpacity>
-              bottomDivider
-             />
-             </View>
-           ))}
-
-           <View style={styles.buttonContainerModal}>
-                    <Button title="purchase" onPress={()=>console.log("purchase")} />
-                    <Button title="Hide modal" onPress={()=>props.setVisibility(false)} />
-           </View>
-
-       </ScrollView>
- </Modal>
       <ScrollView style={styles.container}>
          <View style ={styles.sliderContainer}>
           <Swiper autoplay horizontal={false} height={200} activeDotColor="#181b20">
-          {  resp.games.map(item => ( <TouchableOpacity  key={item._id} onPress={() =>props.navigation.navigate("Offers",{game:item})} style ={styles.slide}>
+          {resp.games.map(item => ( <TouchableOpacity  key={item._id} onPress={() =>props.navigation.navigate("Offers",{game:item})} style ={styles.slide}>
              <Image
                 source={{uri: item.imageURI}}
                 resizeMode ="cover"
@@ -327,7 +296,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state =>({
 
-  visible:state.visible,
+  visible:state.visible
 
 })
 
