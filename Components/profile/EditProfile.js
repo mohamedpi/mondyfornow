@@ -456,14 +456,7 @@ export default class Languages extends Component {
                       <Text style={styles.loginText}>Cancel</Text>
                     </TouchableHighlight>
                   </View>
-                  <View style={styles.buttons}>
-                    <TouchableHighlight
-                      underlayColor="rgba(73,182,77,1,0.9)"
-                      style={[styles.buttonContainer, styles.EditButton]}
-                      onPress={() => this.sendNotification()}>
-                      <Text style={styles.loginText}>Send Notification</Text>
-                    </TouchableHighlight>
-                  </View>
+            
                 </Form>
               </Content>
             </Container>
