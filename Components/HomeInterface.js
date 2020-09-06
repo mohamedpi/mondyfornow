@@ -131,7 +131,7 @@ const discountsURL = "http://192.168.43.173:8082/offer/offerDiscount"
                   <Card
                      containerStyle={styles.cardStyle}
                      imageStyle={styles.imageStyle}
-                     image={require('../assets/dimond4.jpg')}>
+                     image={{uri:item.imageURI}}>
                    </Card>
                 </TouchableOpacity>
               ))}
